@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 6 — Conditionals</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d14;
+    --surface: #13131e;
+    --surface2: #1a1a28;
+    --border: #2a2a40;
+    --accent: #a78bfa;
+    --accent2: #fb7185;
+    --accent3: #34d399;
+    --text: #e8e8f8;
+    --muted: #606080;
+    --code-bg: #0a0a10;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  header {
+    padding: 60px 40px 40px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .top-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: rgba(10, 12, 18, 0.92);
+    padding: 0.85rem 0;
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .top-nav a {
+    color: #fff;
+    text-decoration: none;
+    padding: 0.55rem 0.95rem;
+    border-radius: 0.35rem;
+    background: rgba(255,255,255,0.08);
+    font-weight: 600;
+  }
+
+  .top-nav a:hover {
+    background: rgba(255,255,255,0.14);
+  }
+
+  header::before {
+    content: '';
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 420px; height: 420px;
+    background: radial-gradient(circle, rgba(167,139,250,0.1) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  header::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; left: 150px;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(251,113,133,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .day-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--accent);
+    color: #000;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 2px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  header h1 {
+    font-size: clamp(36px, 6vw, 64px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -2px;
+  }
+
+  header h1 span { color: var(--accent); }
+
+  .header-meta {
+    display: flex;
+    gap: 16px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+
+  .meta-pill {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    padding: 4px 12px;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+  }
+
+  main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 40px 80px;
+  }
+
+  /* PROGRESS */
+  .progress-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 24px;
+    border-radius: 4px;
+    margin-bottom: 40px;
+    margin-top: 40px;
+  }
+
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  .progress-bar { height: 4px; background: var(--surface2); border-radius: 2px; overflow: hidden; }
+
+  .progress-fill {
+    height: 100%;
+    width: 6%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 2px;
+    animation: fillUp 1.5s ease forwards;
+  }
+
+  @keyframes fillUp { from { width: 0; } to { width: 6%; } }
+
+  /* REINFORCEMENT BANNER */
+  .reinforce-banner {
+    background: rgba(52, 211, 153, 0.05);
+    border: 1px solid rgba(52, 211, 153, 0.2);
+    border-radius: 4px;
+    padding: 20px 24px;
+    margin-bottom: 40px;
+  }
+
+  .reinforce-banner-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent3);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .reinforce-pills {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .reinforce-pill {
+    background: rgba(52, 211, 153, 0.08);
+    border: 1px solid rgba(52, 211, 153, 0.2);
+    color: var(--accent3);
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    padding: 4px 12px;
+    border-radius: 2px;
+  }
+
+  /* HOUR BLOCKS */
+  .hour-block { margin-bottom: 60px; }
+
+  .hour-label {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .hour-number {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .hour-divider { flex: 1; height: 1px; background: var(--border); }
+
+  .hour-title {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin-bottom: 4px;
+  }
+
+  /* CONCEPT CARDS */
+  .concept-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 28px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .concept-card:hover { border-color: var(--accent); }
+  .concept-card::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: var(--accent); }
+  .concept-card.pink::before { background: var(--accent2); }
+  .concept-card.green::before { background: var(--accent3); }
+  .concept-card.reinforce::before { background: var(--accent3); }
+
+  .reinforce-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(52, 211, 153, 0.08);
+    border: 1px solid rgba(52, 211, 153, 0.2);
+    color: var(--accent3);
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    padding: 3px 10px;
+    border-radius: 2px;
+    margin-bottom: 14px;
+  }
+
+  .concept-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .concept-title { font-size: 17px; font-weight: 600; letter-spacing: -0.3px; }
+
+  .time-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    background: var(--surface2);
+    padding: 3px 10px;
+    border-radius: 2px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .explanation-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .explanation { font-size: 14px; color: #a0a0c8; line-height: 1.7; margin-bottom: 20px; }
+  .explanation strong { color: var(--accent); font-weight: 600; }
+  .explanation em { color: var(--accent2); font-style: normal; font-weight: 600; }
+
+  /* ANALOGY */
+  .analogy-box {
+    background: rgba(167,139,250,0.04);
+    border: 1px solid rgba(167,139,250,0.15);
+    border-radius: 4px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    color: #a0a0c0;
+    line-height: 1.7;
+  }
+
+  .analogy-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+
+  /* CODE BLOCKS */
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 16px;
+  }
+
+  .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+  }
+
+  .code-dots { display: flex; gap: 6px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot.red { background: #ff5f57; }
+  .dot.yellow { background: #ffbd2e; }
+  .dot.green { background: #28c840; }
+
+  .code-filename { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted); }
+
+  .code-body {
+    padding: 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    line-height: 1.9;
+    overflow-x: auto;
+  }
+
+  .py-keyword { color: #c792ea; }
+  .py-func { color: #82aaff; }
+  .py-def { color: #a78bfa; }
+  .py-string { color: #c3e88d; }
+  .py-var { color: #f8b500; }
+  .py-comment { color: #404060; font-style: italic; }
+  .py-number { color: #f78c6c; }
+  .py-fstring { color: #89ddff; }
+  .py-param { color: #ffcb6b; }
+  .py-op { color: #fb7185; }
+
+  .output-block {
+    background: #07070e;
+    border: 1px solid var(--border);
+    border-top: none;
+    padding: 16px 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    color: var(--accent3);
+    line-height: 1.8;
+  }
+
+  .output-label { font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; }
+
+  /* FLOW DIAGRAM */
+  .flow-diagram {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 28px 20px;
+    margin: 16px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  .flow-row { display: flex; align-items: center; gap: 8px; margin: 4px 0; }
+
+  .flow-box {
+    padding: 10px 18px;
+    border-radius: 3px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    text-align: center;
+    min-width: 140px;
+  }
+
+  .flow-condition { background: rgba(167,139,250,0.1); border: 1px solid rgba(167,139,250,0.3); color: var(--accent); }
+  .flow-true { background: rgba(52,211,153,0.1); border: 1px solid rgba(52,211,153,0.3); color: var(--accent3); }
+  .flow-false { background: rgba(251,113,133,0.1); border: 1px solid rgba(251,113,133,0.3); color: var(--accent2); }
+  .flow-arrow { color: var(--muted); font-size: 18px; font-family: 'Space Mono', monospace; }
+  .flow-label { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 1px; }
+
+  /* OPERATORS TABLE */
+  .ops-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+  }
+
+  .ops-table th {
+    text-align: left;
+    padding: 10px 16px;
+    background: var(--surface2);
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-size: 10px;
+    border: 1px solid var(--border);
+  }
+
+  .ops-table td {
+    padding: 11px 16px;
+    border: 1px solid var(--border);
+    vertical-align: top;
+    line-height: 1.5;
+    color: #a0a0c8;
+  }
+
+  .ops-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .op-sym { color: var(--accent2); font-weight: 700; }
+
+  /* EXERCISE BOX */
+  .exercise-box {
+    background: rgba(167,139,250,0.04);
+    border: 1px solid rgba(167,139,250,0.18);
+    border-radius: 4px;
+    padding: 16px 20px;
+    margin-top: 16px;
+  }
+
+  .exercise-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .exercise-label::before { content: '✦'; font-size: 12px; }
+  .exercise-text { font-size: 14px; color: #9090c0; line-height: 1.6; }
+
+  /* CALLOUT */
+  .callout {
+    background: rgba(251,113,133,0.05);
+    border: 1px solid rgba(251,113,133,0.2);
+    border-radius: 4px;
+    padding: 16px 20px;
+    margin: 16px 0;
+    font-size: 14px;
+    color: #c09090;
+    line-height: 1.7;
+  }
+
+  .callout-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--accent2);
+    margin-bottom: 6px;
+  }
+
+  /* PROJECT CARD */
+  .project-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 32px;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+
+  .project-card::after {
+    content: 'PROJECT';
+    position: absolute;
+    top: 20px; right: 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    background: rgba(167,139,250,0.08);
+    padding: 4px 10px;
+    border: 1px solid rgba(167,139,250,0.25);
+    border-radius: 2px;
+  }
+
+  .project-title { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 6px; }
+  .project-subtitle { font-size: 14px; color: var(--muted); margin-bottom: 24px; }
+
+  /* CHECKLIST */
+  .checklist { list-style: none; margin-top: 20px; }
+
+  .checklist li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    color: #9090c0;
+    line-height: 1.5;
+  }
+
+  .checklist li:last-child { border-bottom: none; }
+
+  .check-box {
+    width: 18px; height: 18px;
+    border: 1.5px solid var(--border);
+    border-radius: 2px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  /* HOMEWORK */
+  .homework-card {
+    background: linear-gradient(135deg, rgba(167,139,250,0.05), rgba(251,113,133,0.03));
+    border: 1px solid rgba(167,139,250,0.22);
+    border-radius: 4px;
+    padding: 28px;
+  }
+
+  .homework-title { font-size: 20px; font-weight: 800; color: var(--accent); margin-bottom: 8px; letter-spacing: -0.5px; }
+
+  .tweet-preview {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 20px;
+    margin-top: 16px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text);
+  }
+
+  .tweet-preview .hashtag { color: #4aa0f0; font-weight: 600; }
+
+  code {
+    background: var(--surface2);
+    padding: 2px 8px;
+    border-radius: 2px;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+  }
+
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+  <nav class="top-nav">
+    <a href="index.html">Home</a>
+    <a href="Intro.html">Intro</a>
+    <a href="functions.html">Functions</a>
+    <a href="forLoops.html">For Loops</a>
+    <a href="conditionals.html">Conditionals</a>
+  </nav>
+
+<header>
+  <div class="day-badge">100 Days of Code</div>
+  <h1>Making<br><span>Decisions</span></h1>
+  <div class="header-meta">
+    <div class="meta-pill">DAY 06</div>
+    <div class="meta-pill">2 HOURS</div>
+    <div class="meta-pill">CONDITIONALS</div>
+    <div class="meta-pill">#BUILDINPUBLIC</div>
+  </div>
+</header>
+
+<main>
+
+  <div class="progress-section">
+    <div class="progress-label">
+      <span>JOURNEY PROGRESS</span>
+      <span>DAY 6 / 100</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill"></div></div>
+  </div>
+
+  <!-- REINFORCEMENT BANNER -->
+  <div class="reinforce-banner">
+    <div class="reinforce-banner-title">↩ Reinforcing From Previous Days</div>
+    <div class="reinforce-pills">
+      <div class="reinforce-pill">f-strings & input()</div>
+      <div class="reinforce-pill">Functions & return values</div>
+      <div class="reinforce-pill">Scope</div>
+    </div>
+    <div style="font-size:13px;color:#608060;margin-top:12px;line-height:1.6;">
+      Today's concepts are deliberately woven together with these. Every exercise and the final project will use functions, f-strings, and input — so the student reinforces them naturally without it feeling like review.
+    </div>
+  </div>
+
+  <!-- HOUR 1 -->
+  <div class="hour-block">
+    <div class="hour-label">
+      <div class="hour-number">Hour 01</div>
+      <div class="hour-divider"></div>
+    </div>
+    <div class="hour-title">Core Concepts & Guided Practice</div>
+
+    <!-- CONCEPT 1 -->
+    <div class="concept-card" style="margin-top:24px;">
+      <div class="concept-header">
+        <div class="concept-title">Concept 1 — if / else: Teaching the Computer to Choose</div>
+        <div class="time-tag">15 mins</div>
+      </div>
+
+      <div class="analogy-box">
+        <div class="analogy-label">💡 Real-World Analogy</div>
+        Every decision you make is a conditional. <strong>"If it's raining, take an umbrella. Otherwise, leave it."</strong> That's exactly what Python's <code>if/else</code> does — it checks whether something is true and runs different code depending on the answer.
+      </div>
+
+      <div class="flow-diagram">
+        <div class="flow-box flow-condition">Is the condition True?</div>
+        <div style="display:flex;gap:60px;align-items:flex-start;margin-top:8px;">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+            <div class="flow-arrow">↓</div>
+            <div class="flow-label">YES</div>
+            <div class="flow-box flow-true">run the if block</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+            <div class="flow-arrow">↓</div>
+            <div class="flow-label">NO</div>
+            <div class="flow-box flow-false">run the else block</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div>
+          <div class="code-filename">if_else.py</div>
+        </div>
+        <div class="code-body">
+<span class="py-comment"># Reinforces: input(), f-strings</span><br>
+<span class="py-var">age</span> = <span class="py-func">int</span>(<span class="py-func">input</span>(<span class="py-string">"How old are you? "</span>))<br><br>
+<span class="py-keyword">if</span> <span class="py-var">age</span> <span class="py-op">>=</span> <span class="py-number">18</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-fstring">f"Welcome! You are {<span class="py-var">age</span>} — old enough to enter."</span>)<br>
+<span class="py-keyword">else</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-fstring">f"Sorry, you are {<span class="py-var">age</span>} — you must be 18 or older."</span>)
+        </div>
+      </div>
+      <div class="output-block">
+        <div class="output-label">Two possible outputs</div>
+        How old are you? <span style="color:var(--accent2)">20</span><br>
+        Welcome! You are 20 — old enough to enter.<br><br>
+        How old are you? <span style="color:var(--accent2)">15</span><br>
+        Sorry, you are 15 — you must be 18 or older.
+      </div>
+
+      <div class="callout">
+        <div class="callout-label">⚠️ COMMON MISTAKE — = vs ==</div>
+        A single <code>=</code> <strong>assigns</strong> a value: <code>age = 18</code><br>
+        A double <code>==</code> <strong>compares</strong> two values: <code>age == 18</code><br>
+        Using <code>=</code> inside an <code>if</code> statement is one of the most common beginner bugs. Always use <code>==</code> when checking.
+      </div>
+
+      <div class="exercise-box">
+        <div class="exercise-label">Exercise</div>
+        <div class="exercise-text">Write a script that asks the user to input a password. If it matches a secret word you define, print <em>"Access granted!"</em> Otherwise print <em>"Wrong password. Try again."</em> Use <code>input()</code> and an f-string in your output.</div>
+      </div>
+    </div>
+
+    <!-- CONCEPT 2 -->
+    <div class="concept-card pink">
+      <div class="concept-header">
+        <div class="concept-title">Concept 2 — elif: Handling Multiple Conditions</div>
+        <div class="time-tag">20 mins</div>
+      </div>
+
+      <div class="explanation-label">Beginner Explanation</div>
+      <div class="explanation">
+        <strong>elif</strong> is short for "else if" — it lets you check a second (or third, or fourth) condition if the first one was false. Python checks each condition top to bottom and runs the <em>first one that's true</em>, then skips the rest.
+      </div>
+
+      <table class="ops-table">
+        <thead>
+          <tr><th>Operator</th><th>Meaning</th><th>Example</th><th>Result</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="op-sym">==</span></td><td>Equal to</td><td><code>5 == 5</code></td><td>True</td></tr>
+          <tr><td><span class="op-sym">!=</span></td><td>Not equal to</td><td><code>5 != 3</code></td><td>True</td></tr>
+          <tr><td><span class="op-sym">&gt;</span></td><td>Greater than</td><td><code>10 &gt; 3</code></td><td>True</td></tr>
+          <tr><td><span class="op-sym">&lt;</span></td><td>Less than</td><td><code>3 &lt; 10</code></td><td>True</td></tr>
+          <tr><td><span class="op-sym">&gt;=</span></td><td>Greater than or equal</td><td><code>5 &gt;= 5</code></td><td>True</td></tr>
+          <tr><td><span class="op-sym">and</span></td><td>Both must be true</td><td><code>age &gt; 18 and age &lt; 65</code></td><td>depends</td></tr>
+          <tr><td><span class="op-sym">or</span></td><td>At least one is true</td><td><code>day == "Sat" or day == "Sun"</code></td><td>depends</td></tr>
+          <tr><td><span class="op-sym">not</span></td><td>Reverses the result</td><td><code>not True</code></td><td>False</td></tr>
+        </tbody>
+      </table>
+
+      <div class="code-block" style="margin-top:20px;">
+        <div class="code-header">
+          <div class="code-dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div>
+          <div class="code-filename">grade_checker.py</div>
+        </div>
+        <div class="code-body">
+<span class="py-comment"># Reinforces: functions, return values, f-strings, input()</span><br><br>
+<span class="py-keyword">def</span> <span class="py-def">get_grade</span>(<span class="py-param">score</span>):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">if</span> <span class="py-param">score</span> <span class="py-op">>=</span> <span class="py-number">90</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">return</span> <span class="py-string">"A — Excellent!"</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">elif</span> <span class="py-param">score</span> <span class="py-op">>=</span> <span class="py-number">80</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">return</span> <span class="py-string">"B — Good job!"</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">elif</span> <span class="py-param">score</span> <span class="py-op">>=</span> <span class="py-number">70</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">return</span> <span class="py-string">"C — You passed."</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">elif</span> <span class="py-param">score</span> <span class="py-op">>=</span> <span class="py-number">60</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">return</span> <span class="py-string">"D — Just made it."</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">else</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">return</span> <span class="py-string">"F — Study harder!"</span><br><br>
+<span class="py-comment"># Main program — uses input() and f-string</span><br>
+<span class="py-var">score</span> = <span class="py-func">int</span>(<span class="py-func">input</span>(<span class="py-string">"Enter your score (0-100): "</span>))<br>
+<span class="py-var">result</span> = <span class="py-def">get_grade</span>(<span class="py-var">score</span>)<br>
+<span class="py-func">print</span>(<span class="py-fstring">f"Your grade: {<span class="py-var">result</span>}"</span>)
+        </div>
+      </div>
+      <div class="output-block">
+        <div class="output-label">Example Output</div>
+        Enter your score (0-100): <span style="color:var(--accent2)">85</span><br>
+        Your grade: B — Good job!
+      </div>
+
+      <div class="exercise-box">
+        <div class="exercise-label">Exercise</div>
+        <div class="exercise-text">Write a function called <code>time_of_day(hour)</code> that takes a number (0–23) and returns <em>"Good morning"</em> for hours 5–11, <em>"Good afternoon"</em> for 12–17, <em>"Good evening"</em> for 18–21, and <em>"You should be sleeping!"</em> for anything else. Call it with <code>input()</code> and print the result with an f-string.</div>
+      </div>
+    </div>
+
+    <!-- CONCEPT 3 — SCOPE REINFORCEMENT -->
+    <div class="concept-card reinforce">
+      <div class="reinforce-tag">↩ Reinforcement — Functions & Scope</div>
+      <div class="concept-header">
+        <div class="concept-title">Concept 3 — Conditionals Inside Functions (Scope Revisited)</div>
+        <div class="time-tag">25 mins</div>
+      </div>
+
+      <div class="explanation-label">Why This Matters</div>
+      <div class="explanation">
+        Real programs combine everything. A function can contain conditionals, and those conditionals can use the function's <strong>local variables</strong> — reinforcing why scope matters. This is also the pattern used in almost every AI automation: <em>receive input → make a decision → return an output.</em>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div>
+          <div class="code-filename">ai_responder.py</div>
+        </div>
+        <div class="code-body">
+<span class="py-comment"># A tiny taste of what AI automations look like:</span><br>
+<span class="py-comment"># receive input → decide → return a response</span><br><br>
+<span class="py-var">bot_name</span> = <span class="py-string">"PyBot"</span>  <span class="py-comment"># GLOBAL variable</span><br><br>
+<span class="py-keyword">def</span> <span class="py-def">respond</span>(<span class="py-param">user_input</span>):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">response</span> = <span class="py-string">""</span>  <span class="py-comment"># LOCAL variable</span><br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">if</span> <span class="py-param">user_input</span> <span class="py-op">==</span> <span class="py-string">"hello"</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">response</span> = <span class="py-string">"Hey there! How can I help?"</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">elif</span> <span class="py-param">user_input</span> <span class="py-op">==</span> <span class="py-string">"bye"</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">response</span> = <span class="py-string">"Goodbye! Come back soon."</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">elif</span> <span class="py-param">user_input</span> <span class="py-op">==</span> <span class="py-string">"help"</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">response</span> = <span class="py-string">"I can respond to: hello, bye, help"</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">else</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">response</span> = <span class="py-string">"I don't understand that yet!"</span><br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">return</span> <span class="py-fstring">f"{<span class="py-var">bot_name</span>}: {<span class="py-var">response</span>}"</span><br><br>
+<span class="py-comment"># Main loop — input() + f-string</span><br>
+<span class="py-var">message</span> = <span class="py-func">input</span>(<span class="py-string">"You: "</span>).lower()<br>
+<span class="py-func">print</span>(<span class="py-def">respond</span>(<span class="py-var">message</span>))
+        </div>
+      </div>
+      <div class="output-block">
+        <div class="output-label">Example Terminal Session</div>
+        You: <span style="color:var(--accent2)">hello</span><br>
+        PyBot: Hey there! How can I help?<br><br>
+        You: <span style="color:var(--accent2)">what is AI</span><br>
+        PyBot: I don't understand that yet!
+      </div>
+
+      <div class="callout">
+        <div class="callout-label">🔥 CONNECT TO THE BIG PICTURE</div>
+        Point this out to the student explicitly: <strong>this is literally how the first chatbots worked</strong> — and it's still the decision-making logic inside modern AI systems, just at a much larger scale. The <code>respond()</code> function is a primitive version of what Claude and ChatGPT do. Let that sink in.
+      </div>
+
+      <div class="exercise-box">
+        <div class="exercise-label">Exercise</div>
+        <div class="exercise-text">Extend the <code>respond()</code> function with 3 more responses of the student's choice. They must use the global <code>bot_name</code> variable in the return value, keep <code>response</code> as a local variable, and use <code>.lower()</code> on the input so capitalisation doesn't break it.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOUR 2 -->
+  <div class="hour-block">
+    <div class="hour-label">
+      <div class="hour-number">Hour 02</div>
+      <div class="hour-divider"></div>
+    </div>
+    <div class="hour-title">Practical Application & Building in Public</div>
+
+    <!-- PROJECT -->
+    <div class="project-card" style="margin-top:24px;">
+      <div class="project-title">The AI Quiz Game</div>
+      <div class="project-subtitle">Conditionals + Functions + Everything Before — 40 mins</div>
+
+      <div class="explanation" style="margin-bottom:0;">
+        Build a 3-question quiz where every question is its own <strong>function</strong>, every answer is checked with <strong>conditionals</strong>, and the final score triggers a <strong>personalised result message</strong>. This intentionally uses everything from the last 3 sessions together.
+      </div>
+
+      <div class="code-block" style="margin-top:20px;">
+        <div class="code-header">
+          <div class="code-dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div>
+          <div class="code-filename">quiz_game.py</div>
+        </div>
+        <div class="code-body">
+<span class="py-comment"># AI Quiz Game — Day 6 Project</span><br>
+<span class="py-comment"># Uses: functions, return, scope, input(), f-strings, conditionals</span><br><br>
+<span class="py-var">player_name</span> = <span class="py-func">input</span>(<span class="py-string">"Enter your name: "</span>)  <span class="py-comment"># GLOBAL</span><br><br>
+<span class="py-keyword">def</span> <span class="py-def">ask_question</span>(<span class="py-param">question</span>, <span class="py-param">correct_answer</span>):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">answer</span> = <span class="py-func">input</span>(<span class="py-fstring">f"{<span class="py-param">question</span>} "</span>).lower()  <span class="py-comment"># LOCAL</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">if</span> <span class="py-var">answer</span> <span class="py-op">==</span> <span class="py-param">correct_answer</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-string">"✓ Correct!\n"</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">return</span> <span class="py-number">1</span>  <span class="py-comment"># return 1 point</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">else</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-fstring">f"✗ Wrong! The answer was {<span class="py-param">correct_answer</span>}.\n"</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">return</span> <span class="py-number">0</span>  <span class="py-comment"># return 0 points</span><br><br>
+<span class="py-keyword">def</span> <span class="py-def">get_result</span>(<span class="py-param">score</span>):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">if</span> <span class="py-param">score</span> <span class="py-op">==</span> <span class="py-number">3</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">return</span> <span class="py-string">"Perfect score! You're a genius 🧠"</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">elif</span> <span class="py-param">score</span> <span class="py-op">==</span> <span class="py-number">2</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">return</span> <span class="py-string">"Great job! So close to perfect."</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">elif</span> <span class="py-param">score</span> <span class="py-op">==</span> <span class="py-number">1</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">return</span> <span class="py-string">"Not bad — keep studying!"</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">else</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">return</span> <span class="py-string">"Better luck next time. You've got this!"</span><br><br>
+<span class="py-comment"># --- Run the quiz ---</span><br>
+<span class="py-func">print</span>(<span class="py-fstring">f"\nWelcome, {<span class="py-var">player_name</span>}! Answer these 3 questions.\n"</span>)<br><br>
+<span class="py-var">score</span> = <span class="py-number">0</span><br>
+<span class="py-var">score</span> <span class="py-op">+=</span> <span class="py-def">ask_question</span>(<span class="py-string">"What language are we learning?"</span>, <span class="py-string">"python"</span>)<br>
+<span class="py-var">score</span> <span class="py-op">+=</span> <span class="py-def">ask_question</span>(<span class="py-string">"What keyword defines a function?"</span>, <span class="py-string">"def"</span>)<br>
+<span class="py-var">score</span> <span class="py-op">+=</span> <span class="py-def">ask_question</span>(<span class="py-string">"What does input() do?"</span>, <span class="py-string">"asks the user for input"</span>)<br><br>
+<span class="py-func">print</span>(<span class="py-fstring">f"{<span class="py-var">player_name</span>}, you scored {<span class="py-var">score</span>}/3!"</span>)<br>
+<span class="py-func">print</span>(<span class="py-def">get_result</span>(<span class="py-var">score</span>))
+        </div>
+      </div>
+
+      <div class="output-block">
+        <div class="output-label">Example Terminal Session</div>
+        Enter your name: <span style="color:var(--accent2)">Marcus</span><br><br>
+        Welcome, Marcus! Answer these 3 questions.<br><br>
+        What language are we learning? <span style="color:var(--accent2)">python</span><br>
+        ✓ Correct!<br><br>
+        What keyword defines a function? <span style="color:var(--accent2)">def</span><br>
+        ✓ Correct!<br><br>
+        What does input() do? <span style="color:var(--accent2)">asks for input</span><br>
+        ✗ Wrong! The answer was asks the user for input.<br><br>
+        Marcus, you scored 2/3!<br>
+        Great job! So close to perfect.
+      </div>
+
+      <div class="callout" style="margin-top:20px;">
+        <div class="callout-label">🔥 STRETCH CHALLENGE</div>
+        Replace the 3 questions with questions about <strong>AI and tech</strong> — things the student actually wants to know. This makes it personally meaningful and doubles as self-study. Bonus: add a <code>hint</code> parameter to <code>ask_question()</code> that prints a clue if the answer is wrong.
+      </div>
+
+      <ul class="checklist">
+        <li><div class="check-box"></div>At least 2 functions defined — <code>ask_question()</code> and <code>get_result()</code></li>
+        <li><div class="check-box"></div>Each function uses parameters and returns a value</li>
+        <li><div class="check-box"></div>All conditionals use correct operators (<code>==</code> not <code>=</code>)</li>
+        <li><div class="check-box"></div>Score is tracked and passed to <code>get_result()</code></li>
+        <li><div class="check-box"></div>Player name is a global variable used across the program</li>
+        <li><div class="check-box"></div>f-strings used in at least 4 print statements</li>
+        <li><div class="check-box"></div>Stretch: Questions are about AI/tech topics the student chose</li>
+      </ul>
+    </div>
+
+    <!-- HOMEWORK -->
+    <div class="homework-card">
+      <div class="homework-title">🚀 Build in Public — Homework</div>
+      <div style="font-size:14px;color:#8080a8;margin-bottom:20px;line-height:1.7;">
+        Same drill. Keep the streak. The audience is growing.
+      </div>
+
+      <ul class="checklist">
+        <li><div class="check-box"></div><div><strong style="color:var(--text);">GitHub:</strong> Add <code>quiz_game.py</code> to the <code>Python-Learning-Journey</code> repo. Commit message: <em>"Day 6: Quiz game using conditionals, functions & f-strings"</em></div></li>
+        <li><div class="check-box"></div><div><strong style="color:var(--text);">Screenshot:</strong> Capture the code in CodeSnap and the terminal showing a full quiz run — ideally with a mix of correct and wrong answers so it looks interesting.</div></li>
+        <li><div class="check-box"></div><div><strong style="color:var(--text);">Post on X:</strong> Use the caption below or personalise it.</div></li>
+      </ul>
+
+      <div class="tweet-preview">
+        Day 6 of my coding journey! Today I learned conditionals — teaching the computer to make decisions with if/elif/else. Built a quiz game that tracks your score and gives you a personalised result. Starting to feel like I can build real things. 🎯 <span class="hashtag">#100DaysOfCode</span> <span class="hashtag">#Python</span> <span class="hashtag">#BuildInPublic</span>
+      </div>
+    </div>
+  </div>
+
+</main>
+</body>
+</html>

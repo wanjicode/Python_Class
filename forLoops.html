@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 7 — Loops</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --surface: #13161e;
+    --surface2: #1a1e28;
+    --border: #252d40;
+    --accent: #38bdf8;
+    --accent2: #fb923c;
+    --accent3: #a3e635;
+    --text: #e8f0f8;
+    --muted: #506070;
+    --code-bg: #0a0c10;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  header {
+    padding: 60px 40px 40px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .top-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: rgba(10, 12, 18, 0.92);
+    padding: 0.85rem 0;
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .top-nav a {
+    color: #fff;
+    text-decoration: none;
+    padding: 0.55rem 0.95rem;
+    border-radius: 0.35rem;
+    background: rgba(255,255,255,0.08);
+    font-weight: 600;
+  }
+
+  .top-nav a:hover {
+    background: rgba(255,255,255,0.14);
+  }
+
+  header::before {
+    content: '';
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 420px; height: 420px;
+    background: radial-gradient(circle, rgba(56,189,248,0.09) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  header::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; left: 180px;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(251,146,60,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .day-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--accent);
+    color: #000;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 2px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  header h1 {
+    font-size: clamp(36px, 6vw, 64px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -2px;
+  }
+
+  header h1 span { color: var(--accent); }
+
+  .header-meta {
+    display: flex;
+    gap: 16px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+
+  .meta-pill {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    padding: 4px 12px;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+  }
+
+  main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 40px 80px;
+  }
+
+  /* PROGRESS */
+  .progress-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 24px;
+    border-radius: 4px;
+    margin-bottom: 32px;
+    margin-top: 40px;
+  }
+
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  .progress-bar { height: 4px; background: var(--surface2); border-radius: 2px; overflow: hidden; }
+
+  .progress-fill {
+    height: 100%;
+    width: 7%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 2px;
+    animation: fillUp 1.5s ease forwards;
+  }
+
+  @keyframes fillUp { from { width: 0; } to { width: 7%; } }
+
+  /* STRETCH CALLOUT */
+  .stretch-win {
+    background: rgba(163, 230, 53, 0.05);
+    border: 1px solid rgba(163, 230, 53, 0.2);
+    border-radius: 4px;
+    padding: 18px 24px;
+    margin-bottom: 32px;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .stretch-win-icon {
+    font-size: 24px;
+    line-height: 1;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .stretch-win-text {
+    font-size: 14px;
+    color: #88a850;
+    line-height: 1.6;
+  }
+
+  .stretch-win-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent3);
+    margin-bottom: 4px;
+  }
+
+  /* REINFORCEMENT BANNER */
+  .reinforce-banner {
+    background: rgba(56, 189, 248, 0.04);
+    border: 1px solid rgba(56, 189, 248, 0.15);
+    border-radius: 4px;
+    padding: 18px 24px;
+    margin-bottom: 40px;
+  }
+
+  .reinforce-banner-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+
+  .reinforce-pills { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  .reinforce-pill {
+    background: rgba(56, 189, 248, 0.07);
+    border: 1px solid rgba(56, 189, 248, 0.18);
+    color: var(--accent);
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    padding: 4px 12px;
+    border-radius: 2px;
+  }
+
+  /* HOUR BLOCKS */
+  .hour-block { margin-bottom: 60px; }
+
+  .hour-label {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .hour-number {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .hour-divider { flex: 1; height: 1px; background: var(--border); }
+
+  .hour-title {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+  }
+
+  /* CONCEPT CARDS */
+  .concept-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 28px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .concept-card:hover { border-color: var(--accent); }
+  .concept-card::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: var(--accent); }
+  .concept-card.orange::before { background: var(--accent2); }
+  .concept-card.lime::before { background: var(--accent3); }
+
+  .concept-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .concept-title { font-size: 17px; font-weight: 600; letter-spacing: -0.3px; }
+
+  .time-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    background: var(--surface2);
+    padding: 3px 10px;
+    border-radius: 2px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .explanation-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .explanation { font-size: 14px; color: #8090a8; line-height: 1.7; margin-bottom: 20px; }
+  .explanation strong { color: var(--accent); font-weight: 600; }
+  .explanation em { color: var(--accent2); font-style: normal; font-weight: 600; }
+
+  /* ANALOGY */
+  .analogy-box {
+    background: rgba(56, 189, 248, 0.04);
+    border: 1px solid rgba(56, 189, 248, 0.14);
+    border-radius: 4px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    color: #7090a8;
+    line-height: 1.7;
+  }
+
+  .analogy-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+
+  /* SIDE BY SIDE */
+  .side-by-side {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  @media (max-width: 600px) { .side-by-side { grid-template-columns: 1fr; } }
+
+  /* CODE BLOCKS */
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 16px;
+  }
+
+  .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+  }
+
+  .code-dots { display: flex; gap: 6px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot.red { background: #ff5f57; }
+  .dot.yellow { background: #ffbd2e; }
+  .dot.green { background: #28c840; }
+
+  .code-filename { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted); }
+
+  .code-body {
+    padding: 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    line-height: 1.9;
+    overflow-x: auto;
+  }
+
+  .py-keyword { color: #c792ea; }
+  .py-func { color: #82aaff; }
+  .py-def { color: #38bdf8; }
+  .py-string { color: #c3e88d; }
+  .py-var { color: #f8b500; }
+  .py-comment { color: #384858; font-style: italic; }
+  .py-number { color: #f78c6c; }
+  .py-fstring { color: #89ddff; }
+  .py-param { color: #ffcb6b; }
+  .py-op { color: #fb923c; }
+  .py-range { color: #a3e635; }
+
+  .output-block {
+    background: #080a0e;
+    border: 1px solid var(--border);
+    border-top: none;
+    padding: 16px 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    color: var(--accent);
+    line-height: 1.8;
+  }
+
+  .output-label { font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; }
+
+  /* LOOP DIAGRAM */
+  .loop-diagram {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 24px;
+    margin: 16px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+  }
+
+  .ld-box {
+    padding: 10px 24px;
+    border-radius: 3px;
+    text-align: center;
+    min-width: 180px;
+  }
+
+  .ld-start  { background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.3); color: var(--accent); }
+  .ld-check  { background: rgba(251,146,60,0.1); border: 1px solid rgba(251,146,60,0.3); color: var(--accent2); }
+  .ld-body   { background: rgba(163,230,53,0.1); border: 1px solid rgba(163,230,53,0.3); color: var(--accent3); }
+  .ld-end    { background: rgba(100,100,140,0.1); border: 1px solid rgba(100,100,140,0.3); color: var(--muted); }
+
+  .ld-arrow { color: var(--muted); font-size: 16px; }
+  .ld-back  { font-size: 11px; color: var(--accent2); letter-spacing: 1px; }
+
+  /* COMPARISON TABLE */
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+  }
+
+  .compare-table th {
+    text-align: left;
+    padding: 10px 16px;
+    background: var(--surface2);
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-size: 10px;
+    border: 1px solid var(--border);
+  }
+
+  .compare-table td {
+    padding: 11px 16px;
+    border: 1px solid var(--border);
+    vertical-align: top;
+    line-height: 1.6;
+    color: #8090a8;
+    font-size: 12px;
+  }
+
+  .compare-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+  /* CALLOUT */
+  .callout {
+    background: rgba(251,146,60,0.05);
+    border: 1px solid rgba(251,146,60,0.2);
+    border-radius: 4px;
+    padding: 16px 20px;
+    margin: 16px 0;
+    font-size: 14px;
+    color: #a07050;
+    line-height: 1.7;
+  }
+
+  .callout-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--accent2);
+    margin-bottom: 6px;
+  }
+
+  .callout.danger {
+    background: rgba(251,113,133,0.05);
+    border-color: rgba(251,113,133,0.2);
+    color: #a07070;
+  }
+
+  .callout.danger .callout-label { color: #fb7185; }
+
+  /* EXERCISE BOX */
+  .exercise-box {
+    background: rgba(56, 189, 248, 0.04);
+    border: 1px solid rgba(56, 189, 248, 0.16);
+    border-radius: 4px;
+    padding: 16px 20px;
+    margin-top: 16px;
+  }
+
+  .exercise-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .exercise-label::before { content: '✦'; font-size: 12px; }
+  .exercise-text { font-size: 14px; color: #7090a8; line-height: 1.6; }
+
+  /* PROJECT CARD */
+  .project-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 32px;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+
+  .project-card::after {
+    content: 'PROJECT';
+    position: absolute;
+    top: 20px; right: 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    background: rgba(56,189,248,0.08);
+    padding: 4px 10px;
+    border: 1px solid rgba(56,189,248,0.22);
+    border-radius: 2px;
+  }
+
+  .project-title { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 6px; }
+  .project-subtitle { font-size: 14px; color: var(--muted); margin-bottom: 24px; }
+
+  /* CHECKLIST */
+  .checklist { list-style: none; margin-top: 20px; }
+
+  .checklist li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    color: #7090a8;
+    line-height: 1.5;
+  }
+
+  .checklist li:last-child { border-bottom: none; }
+
+  .check-box {
+    width: 18px; height: 18px;
+    border: 1.5px solid var(--border);
+    border-radius: 2px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  /* HOMEWORK */
+  .homework-card {
+    background: linear-gradient(135deg, rgba(56,189,248,0.05), rgba(251,146,60,0.03));
+    border: 1px solid rgba(56,189,248,0.2);
+    border-radius: 4px;
+    padding: 28px;
+  }
+
+  .homework-title { font-size: 20px; font-weight: 800; color: var(--accent); margin-bottom: 8px; letter-spacing: -0.5px; }
+
+  .tweet-preview {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 20px;
+    margin-top: 16px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text);
+  }
+
+  .tweet-preview .hashtag { color: #4aa0f0; font-weight: 600; }
+
+  code {
+    background: var(--surface2);
+    padding: 2px 8px;
+    border-radius: 2px;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+  }
+
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+  <nav class="top-nav">
+    <a href="index.html">Home</a>
+    <a href="Intro.html">Intro</a>
+    <a href="functions.html">Functions</a>
+    <a href="forLoops.html">For Loops</a>
+    <a href="conditionals.html">Conditionals</a>
+  </nav>
+
+<header>
+  <div class="day-badge">100 Days of Code</div>
+  <h1>Doing Things<br><span>Over & Over</span></h1>
+  <div class="header-meta">
+    <div class="meta-pill">DAY 07</div>
+    <div class="meta-pill">2 HOURS</div>
+    <div class="meta-pill">FOR & WHILE LOOPS</div>
+    <div class="meta-pill">#BUILDINPUBLIC</div>
+  </div>
+</header>
+
+<main>
+
+  <div class="progress-section">
+    <div class="progress-label">
+      <span>JOURNEY PROGRESS</span>
+      <span>DAY 7 / 100</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill"></div></div>
+  </div>
+
+  <!-- STRETCH WIN -->
+  <div class="stretch-win">
+    <div class="stretch-win-icon">🏆</div>
+    <div>
+      <div class="stretch-win-title">Stretch Challenge Completed — Day 6</div>
+      <div class="stretch-win-text">The student added a <code>hint</code> parameter to <code>ask_question()</code> and replaced questions with AI/tech topics. That's independent thinking applied to the code — exactly the mindset needed for AI engineering. Today we push a little harder because of it.</div>
+    </div>
+  </div>
+
+  <!-- REINFORCEMENT BANNER -->
+  <div class="reinforce-banner">
+    <div class="reinforce-banner-title">↩ Reinforcing Throughout Today</div>
+    <div class="reinforce-pills">
+      <div class="reinforce-pill">functions & return</div>
+      <div class="reinforce-pill">conditionals (if/elif/else)</div>
+      <div class="reinforce-pill">f-strings & input()</div>
+      <div class="reinforce-pill">scope</div>
+    </div>
+  </div>
+
+  <!-- HOUR 1 -->
+  <div class="hour-block">
+    <div class="hour-label">
+      <div class="hour-number">Hour 01</div>
+      <div class="hour-divider"></div>
+    </div>
+    <div class="hour-title">Core Concepts & Guided Practice</div>
+
+    <!-- CONCEPT 1: for loop -->
+    <div class="concept-card" style="margin-top:24px;">
+      <div class="concept-header">
+        <div class="concept-title">Concept 1 — The <code style="font-size:14px;">for</code> Loop: Repeating a Known Number of Times</div>
+        <div class="time-tag">20 mins</div>
+      </div>
+
+      <div class="analogy-box">
+        <div class="analogy-label">💡 Real-World Analogy</div>
+        Imagine you have a list of 10 friends and you want to text each of them "Happy Birthday." You don't type 10 separate messages — you loop through the list and send the same message to each one. A <strong>for loop</strong> does exactly that: it runs a block of code <em>once for every item in a sequence</em>.
+      </div>
+
+      <div class="explanation-label">How it works</div>
+      <div class="explanation">
+        A <strong>for loop</strong> iterates over a sequence — a range of numbers, a list of names, or any collection of items. The loop variable (<em>the thing after <code>for</code></em>) takes the value of each item one at a time, and the indented block runs for each one.
+      </div>
+
+      <div class="side-by-side">
+        <div class="code-block" style="margin-top:0;">
+          <div class="code-header">
+            <div class="code-dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div>
+            <div class="code-filename">for_range.py</div>
+          </div>
+          <div class="code-body">
+<span class="py-comment"># Loop 5 times using range()</span><br>
+<span class="py-keyword">for</span> <span class="py-var">i</span> <span class="py-keyword">in</span> <span class="py-range">range</span>(<span class="py-number">5</span>):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-fstring">f"Step {<span class="py-var">i</span>}"</span>)
+          </div>
+          <div class="output-block" style="border-top: 1px solid var(--border);">
+            Step 0<br>Step 1<br>Step 2<br>Step 3<br>Step 4
+          </div>
+        </div>
+
+        <div class="code-block" style="margin-top:0;">
+          <div class="code-header">
+            <div class="code-dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div>
+            <div class="code-filename">for_list.py</div>
+          </div>
+          <div class="code-body">
+<span class="py-comment"># Loop over a list of items</span><br>
+<span class="py-var">tools</span> = [<span class="py-string">"Python"</span>, <span class="py-string">"VS Code"</span>, <span class="py-string">"Git"</span>]<br>
+<span class="py-keyword">for</span> <span class="py-var">tool</span> <span class="py-keyword">in</span> <span class="py-var">tools</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-fstring">f"I use {<span class="py-var">tool</span>}"</span>)
+          </div>
+          <div class="output-block" style="border-top: 1px solid var(--border);">
+            I use Python<br>I use VS Code<br>I use Git
+          </div>
+        </div>
+      </div>
+
+      <div class="callout" style="margin-top:20px;">
+        <div class="callout-label">💡 range() explained</div>
+        <code>range(5)</code> gives you numbers 0, 1, 2, 3, 4 — note it <strong>stops before 5</strong>, not at 5. This trips up a lot of beginners.<br><br>
+        <code>range(1, 6)</code> → 1, 2, 3, 4, 5 &nbsp;|&nbsp; <code>range(0, 10, 2)</code> → 0, 2, 4, 6, 8 (step of 2)
+      </div>
+
+      <div class="exercise-box">
+        <div class="exercise-label">Exercise</div>
+        <div class="exercise-text">
+          Write a function called <code>countdown(start)</code> that uses a <code>for</code> loop with <code>range()</code> to print numbers from <em>start</em> down to 1, then prints <em>"Blast off! 🚀"</em>. Call it with <code>input()</code> — ask the user where to start the countdown. Use an f-string in every print.
+        </div>
+      </div>
+    </div>
+
+    <!-- CONCEPT 2: while loop -->
+    <div class="concept-card orange">
+      <div class="concept-header">
+        <div class="concept-title">Concept 2 — The <code style="font-size:14px;">while</code> Loop: Repeating Until a Condition Changes</div>
+        <div class="time-tag">20 mins</div>
+      </div>
+
+      <div class="analogy-box" style="background:rgba(251,146,60,0.04);border-color:rgba(251,146,60,0.14);">
+        <div class="analogy-label" style="color:var(--accent2);">💡 Real-World Analogy</div>
+        A <strong>while loop</strong> is like a security guard checking "is the door locked?" over and over. As long as the answer is no, they keep checking. The moment the door is locked, they stop. You use a <code>while</code> loop when you <em>don't know in advance how many times</em> something needs to repeat.
+      </div>
+
+      <div class="loop-diagram">
+        <div class="ld-box ld-start">Loop starts</div>
+        <div class="ld-arrow">↓</div>
+        <div class="ld-box ld-check">Is condition still True?</div>
+        <div style="display:flex;gap:50px;align-items:flex-start;margin-top:4px;">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+            <div class="ld-arrow">↓</div>
+            <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--accent3);">YES</div>
+            <div class="ld-box ld-body">Run the loop body</div>
+            <div class="ld-arrow">↓</div>
+            <div class="ld-back">↩ back to check</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+            <div class="ld-arrow">↓</div>
+            <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--accent2);">NO</div>
+            <div class="ld-box ld-end">Exit the loop</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div>
+          <div class="code-filename">while_loop.py</div>
+        </div>
+        <div class="code-body">
+<span class="py-comment"># Reinforces: input(), conditionals, f-strings</span><br><br>
+<span class="py-keyword">def</span> <span class="py-def">guess_game</span>():<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">secret</span> = <span class="py-number">7</span>          <span class="py-comment"># LOCAL</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">guess</span> = <span class="py-number">0</span>           <span class="py-comment"># start value — not the secret</span><br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">while</span> <span class="py-var">guess</span> <span class="py-op">!=</span> <span class="py-var">secret</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">guess</span> = <span class="py-func">int</span>(<span class="py-func">input</span>(<span class="py-string">"Guess the number (1-10): "</span>))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">if</span> <span class="py-var">guess</span> <span class="py-op"><</span> <span class="py-var">secret</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-string">"Too low! Try again."</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">elif</span> <span class="py-var">guess</span> <span class="py-op">></span> <span class="py-var">secret</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-string">"Too high! Try again."</span>)<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-fstring">f"🎉 Correct! The number was {<span class="py-var">secret</span>}."</span>)<br><br>
+<span class="py-def">guess_game</span>()
+        </div>
+      </div>
+      <div class="output-block">
+        <div class="output-label">Example Session</div>
+        Guess the number (1-10): <span style="color:var(--accent2)">3</span><br>
+        Too low! Try again.<br>
+        Guess the number (1-10): <span style="color:var(--accent2)">9</span><br>
+        Too high! Try again.<br>
+        Guess the number (1-10): <span style="color:var(--accent2)">7</span><br>
+        🎉 Correct! The number was 7.
+      </div>
+
+      <div class="callout danger">
+        <div class="callout-label">⚠️ THE INFINITE LOOP — Most Common while Bug</div>
+        If the condition never becomes False, the loop runs forever and your program freezes. Always ask: <strong>"Is there something inside my loop that will eventually make the condition False?"</strong> In the example above, the user typing the correct guess makes <code>guess == secret</code>, which stops the loop.
+      </div>
+
+      <div class="exercise-box">
+        <div class="exercise-label">Exercise</div>
+        <div class="exercise-text">Write a <code>while</code> loop that keeps asking the user to type <em>"quit"</em> to exit. Until they do, print back whatever they typed in uppercase using an f-string. This is the skeleton of a <strong>chatbot input loop</strong> — something they'll build for real soon.</div>
+      </div>
+    </div>
+
+    <!-- CONCEPT 3: break, continue, combining with functions -->
+    <div class="concept-card lime">
+      <div class="concept-header">
+        <div class="concept-title">Concept 3 — <code style="font-size:14px;">break</code>, <code style="font-size:14px;">continue</code> & Loops Inside Functions</div>
+        <div class="time-tag">20 mins</div>
+      </div>
+
+      <div class="explanation-label">Beginner Explanation</div>
+      <div class="explanation">
+        Sometimes you want to <strong>escape a loop early</strong> (<em>break</em>) or <strong>skip one iteration</strong> (<em>continue</em>) without stopping the whole loop. Combined with functions, loops become the engine behind almost every real automation script.
+      </div>
+
+      <table class="compare-table">
+        <thead>
+          <tr><th>Keyword</th><th>What it does</th><th>When to use it</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="color:var(--accent3);"><code>break</code></td>
+            <td>Exits the loop immediately</td>
+            <td>Found what you were looking for, or hit an error condition</td>
+          </tr>
+          <tr>
+            <td style="color:var(--accent2);"><code>continue</code></td>
+            <td>Skips the rest of this iteration, jumps to next</td>
+            <td>Want to ignore certain items but keep looping</td>
+          </tr>
+          <tr>
+            <td style="color:var(--accent);"><code>range(start, stop, step)</code></td>
+            <td>Generates a sequence with full control</td>
+            <td>Counting up, down, or by specific intervals</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="code-block" style="margin-top:20px;">
+        <div class="code-header">
+          <div class="code-dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div>
+          <div class="code-filename">break_continue.py</div>
+        </div>
+        <div class="code-body">
+<span class="py-comment"># Reinforces: functions, scope, conditionals, f-strings</span><br><br>
+<span class="py-keyword">def</span> <span class="py-def">find_first_even</span>(<span class="py-param">limit</span>):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">for</span> <span class="py-var">n</span> <span class="py-keyword">in</span> <span class="py-range">range</span>(<span class="py-number">1</span>, <span class="py-param">limit</span>):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">if</span> <span class="py-var">n</span> <span class="py-op">%</span> <span class="py-number">2</span> <span class="py-op">==</span> <span class="py-number">0</span>:  <span class="py-comment"># % is "modulo" — remainder after dividing</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-fstring">f"Found first even number: {<span class="py-var">n</span>}"</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">break</span>  <span class="py-comment"># stop as soon as we find it</span><br><br>
+<span class="py-keyword">def</span> <span class="py-def">print_odds_only</span>(<span class="py-param">limit</span>):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">for</span> <span class="py-var">n</span> <span class="py-keyword">in</span> <span class="py-range">range</span>(<span class="py-number">1</span>, <span class="py-param">limit</span>):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">if</span> <span class="py-var">n</span> <span class="py-op">%</span> <span class="py-number">2</span> <span class="py-op">==</span> <span class="py-number">0</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">continue</span>  <span class="py-comment"># skip even numbers</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-fstring">f"{<span class="py-var">n</span>} is odd"</span>)<br><br>
+<span class="py-def">find_first_even</span>(<span class="py-number">10</span>)<br>
+<span class="py-def">print_odds_only</span>(<span class="py-number">8</span>)
+        </div>
+      </div>
+      <div class="output-block">
+        <div class="output-label">Output</div>
+        Found first even number: 2<br>
+        1 is odd<br>3 is odd<br>5 is odd<br>7 is odd
+      </div>
+
+      <div class="callout" style="background:rgba(163,230,53,0.04);border-color:rgba(163,230,53,0.18);color:#708050;">
+        <div class="callout-label" style="color:var(--accent3);">🔗 CONNECT TO AI ENGINEERING</div>
+        Tell the student: <em>"Every AI automation script is basically a loop. It loops through emails, documents, API responses, or user messages — checks a condition on each one — and decides what to do. You're learning the core engine of automation right now."</em>
+      </div>
+
+      <div class="exercise-box">
+        <div class="exercise-label">Exercise</div>
+        <div class="exercise-text">Write a function <code>count_down_skip(start)</code> that counts down from <em>start</em> to 1 but <strong>skips multiples of 3</strong> using <code>continue</code>. Use <code>range()</code> with a negative step. Print each number with an f-string.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOUR 2 -->
+  <div class="hour-block">
+    <div class="hour-label">
+      <div class="hour-number">Hour 02</div>
+      <div class="hour-divider"></div>
+    </div>
+    <div class="hour-title">Practical Application & Building in Public</div>
+
+    <!-- PROJECT -->
+    <div class="project-card" style="margin-top:24px;">
+      <div class="project-title">The Infinite Chatbot Loop</div>
+      <div class="project-subtitle">while + for + conditionals + functions — 40 mins</div>
+
+      <div class="explanation" style="margin-bottom:0;">
+        Build a chatbot that <strong>keeps running until the user says goodbye</strong> — using a <code>while</code> loop as the main engine. It tracks the conversation history with a <code>for</code> loop, and every response comes from a function with conditionals inside. This is a direct preview of how real AI chatbot interfaces work.
+      </div>
+
+      <div class="code-block" style="margin-top:20px;">
+        <div class="code-header">
+          <div class="code-dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div>
+          <div class="code-filename">chatbot.py</div>
+        </div>
+        <div class="code-body">
+<span class="py-comment"># The Infinite Chatbot Loop — Day 7 Project</span><br>
+<span class="py-comment"># while loop + for loop + functions + conditionals + f-strings</span><br><br>
+<span class="py-var">bot_name</span> = <span class="py-string">"Nova"</span>      <span class="py-comment"># GLOBAL</span><br>
+<span class="py-var">history</span> = []          <span class="py-comment"># stores the conversation (preview of lists!)</span><br><br>
+<span class="py-keyword">def</span> <span class="py-def">get_response</span>(<span class="py-param">message</span>):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">msg</span> = <span class="py-param">message</span>.lower()  <span class="py-comment"># LOCAL</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">if</span> <span class="py-var">msg</span> <span class="py-keyword">in</span> [<span class="py-string">"hi"</span>, <span class="py-string">"hello"</span>, <span class="py-string">"hey"</span>]:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">return</span> <span class="py-string">"Hey! What's on your mind?"</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">elif</span> <span class="py-string">"python"</span> <span class="py-keyword">in</span> <span class="py-var">msg</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">return</span> <span class="py-string">"Python is awesome — great choice!"</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">elif</span> <span class="py-string">"ai"</span> <span class="py-keyword">in</span> <span class="py-var">msg</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">return</span> <span class="py-string">"AI is the future — keep building!"</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">elif</span> <span class="py-var">msg</span> <span class="py-keyword">in</span> [<span class="py-string">"bye"</span>, <span class="py-string">"quit"</span>, <span class="py-string">"exit"</span>]:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">return</span> <span class="py-string">"EXIT"</span>  <span class="py-comment"># special signal to stop the loop</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">else</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">return</span> <span class="py-string">"Interesting! Tell me more."</span><br><br>
+<span class="py-keyword">def</span> <span class="py-def">show_history</span>():<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-string">"\n--- Conversation History ---"</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">for</span> <span class="py-var">line</span> <span class="py-keyword">in</span> <span class="py-var">history</span>:  <span class="py-comment"># for loop over the history list</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-var">line</span>)<br><br>
+<span class="py-comment"># --- Main loop ---</span><br>
+<span class="py-func">print</span>(<span class="py-fstring">f"{<span class="py-var">bot_name</span>}: Hi! I'm {<span class="py-var">bot_name</span>}. Type 'bye' to exit.\n"</span>)<br><br>
+<span class="py-keyword">while</span> <span class="py-keyword">True</span>:  <span class="py-comment"># runs forever until break</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">user_input</span> = <span class="py-func">input</span>(<span class="py-string">"You: "</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">response</span> = <span class="py-def">get_response</span>(<span class="py-var">user_input</span>)<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">if</span> <span class="py-var">response</span> <span class="py-op">==</span> <span class="py-string">"EXIT"</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-fstring">f"{<span class="py-var">bot_name</span>}: Goodbye! See you tomorrow. 👋"</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">break</span><br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">history</span>.append(<span class="py-fstring">f"You: {<span class="py-var">user_input</span>}"</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">history</span>.append(<span class="py-fstring">f"{<span class="py-var">bot_name</span>}: {<span class="py-var">response</span>}"</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-fstring">f"{<span class="py-var">bot_name</span>}: {<span class="py-var">response</span>}\n"</span>)<br><br>
+<span class="py-def">show_history</span>()
+        </div>
+      </div>
+
+      <div class="output-block">
+        <div class="output-label">Example Session</div>
+        Nova: Hi! I'm Nova. Type 'bye' to exit.<br><br>
+        You: <span style="color:var(--accent2)">hello</span><br>
+        Nova: Hey! What's on your mind?<br><br>
+        You: <span style="color:var(--accent2)">I love AI</span><br>
+        Nova: AI is the future — keep building!<br><br>
+        You: <span style="color:var(--accent2)">bye</span><br>
+        Nova: Goodbye! See you tomorrow. 👋<br><br>
+        --- Conversation History ---<br>
+        You: hello<br>
+        Nova: Hey! What's on your mind?<br>
+        You: I love AI<br>
+        Nova: AI is the future — keep building!
+      </div>
+
+      <div class="callout" style="background:rgba(163,230,53,0.04);border-color:rgba(163,230,53,0.18);color:#708050;margin-top:20px;">
+        <div class="callout-label" style="color:var(--accent3);">🔥 STRETCH CHALLENGE</div>
+        Add a <strong>message counter</strong> — track how many messages the user sent and print <em>"You sent X messages in this session."</em> at the end. Then add one more response to <code>get_response()</code> that's specific to something the student personally cares about — football, music, whatever. Make Nova feel personal.
+      </div>
+
+      <ul class="checklist">
+        <li><div class="check-box"></div><code>while True</code> loop runs the chatbot until <code>break</code> is hit</li>
+        <li><div class="check-box"></div><code>get_response()</code> function uses conditionals and returns a value</li>
+        <li><div class="check-box"></div><code>show_history()</code> function uses a <code>for</code> loop to print all messages</li>
+        <li><div class="check-box"></div>Typing "bye", "quit", or "exit" cleanly ends the loop</li>
+        <li><div class="check-box"></div>f-strings used throughout — no string concatenation with <code>+</code></li>
+        <li><div class="check-box"></div>Global <code>bot_name</code> and <code>history</code> used correctly</li>
+        <li><div class="check-box"></div>Stretch: message counter printed at end of session</li>
+      </ul>
+    </div>
+
+    <!-- HOMEWORK -->
+    <div class="homework-card">
+      <div class="homework-title">🚀 Build in Public — Homework</div>
+      <div style="font-size:14px;color:#507080;margin-bottom:20px;line-height:1.7;">
+        This one is worth posting. A working chatbot loop is the most visually impressive thing they've built yet.
+      </div>
+
+      <ul class="checklist">
+        <li><div class="check-box"></div><div><strong style="color:var(--text);">GitHub:</strong> Push <code>chatbot.py</code> to <code>Python-Learning-Journey</code>. Commit message: <em>"Day 7: Infinite chatbot loop using while, for, functions & conditionals"</em></div></li>
+        <li><div class="check-box"></div><div><strong style="color:var(--text);">Screenshot:</strong> Record a short terminal session showing a full conversation — at least 4 exchanges before saying bye. Use CodeSnap for the code, screenshot the terminal output.</div></li>
+        <li><div class="check-box"></div><div><strong style="color:var(--text);">Post on X:</strong> Use the caption below.</div></li>
+      </ul>
+
+      <div class="tweet-preview">
+        Day 7 — I just built a working chatbot from scratch using Python loops. No AI API yet, just pure logic. A while loop keeps it running, a for loop replays the conversation history. The fundamentals are clicking. Next step: connecting it to a real AI. 🤖 <span class="hashtag">#100DaysOfCode</span> <span class="hashtag">#Python</span> <span class="hashtag">#BuildInPublic</span>
+      </div>
+    </div>
+  </div>
+
+</main>
+</body>
+</html>

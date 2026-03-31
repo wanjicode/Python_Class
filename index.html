@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Welcome to Python</title>
+    <style>
+      :root {
+        font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: #102a43;
+        background: #f4f7ff;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: radial-gradient(circle at top left, rgba(45, 125, 249, 0.18), transparent 30%), #eef4ff;
+      }
+
+      header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: rgba(18, 48, 106, 0.94);
+        backdrop-filter: blur(14px);
+        padding: 1rem 1.5rem;
+        box-shadow: 0 18px 45px rgba(10, 35, 92, 0.14);
+      }
+
+      .top-nav {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.9rem;
+      }
+
+      nav a {
+        color: #f8fbff;
+        text-decoration: none;
+        padding: 0.85rem 1.2rem;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        transition: transform 160ms ease, background-color 160ms ease, box-shadow 160ms ease;
+      }
+
+      nav a:hover,
+      nav a:focus-visible {
+        transform: translateY(-1px);
+        background: rgba(255, 255, 255, 0.22);
+        box-shadow: 0 14px 26px rgba(10, 35, 92, 0.14);
+      }
+
+      main {
+        padding: 3rem 1.5rem 4rem;
+        max-width: 960px;
+        margin: 0 auto;
+      }
+
+      .hero {
+        background: #ffffff;
+        border-radius: 2rem;
+        padding: 3rem 2.2rem;
+        box-shadow: 0 28px 80px rgba(27, 72, 161, 0.12);
+        border: 1px solid rgba(15, 52, 114, 0.08);
+      }
+
+      .hero h1 {
+        margin: 0 0 1rem;
+        font-size: clamp(2.8rem, 4vw, 4.2rem);
+        line-height: 1.02;
+      }
+
+      .hero p {
+        margin: 0 auto 1.75rem;
+        max-width: 42rem;
+        font-size: 1.15rem;
+        line-height: 1.8;
+        color: #4a6274;
+      }
+
+      .cards {
+        display: grid;
+        gap: 1.25rem;
+        margin-top: 2rem;
+      }
+
+      .card {
+        background: #f8fbff;
+        border-radius: 1.5rem;
+        padding: 1.5rem;
+        border: 1px solid rgba(15, 50, 116, 0.08);
+        box-shadow: 0 18px 36px rgba(15, 50, 116, 0.08);
+      }
+
+      .card h2 {
+        margin: 0 0 0.6rem;
+        font-size: 1.25rem;
+        color: #102a43;
+      }
+
+      .card p {
+        margin: 0;
+        font-size: 1rem;
+        line-height: 1.75;
+        color: #4c6272;
+      }
+
+      @media (min-width: 720px) {
+        .cards {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav class="top-nav">
+        <a href="Intro.html">Intro</a>
+        <a href="functions.html">Functions</a>
+        <a href="forLoops.html">For Loops</a>
+        <a href="conditionals.html">Conditionals</a>
+      </nav>
+    </header>
+    <main>
+      <section class="hero">
+        <h1>Welcome to Python</h1>
+        <p>Start your coding journey with friendly, easy-to-follow lessons. Explore the introduction, functions, loops, and conditionals to build strong programming skills.</p>
+        <div class="cards">
+          <article class="card">
+            <h2>Intro</h2>
+            <p>Discover what Python is and how to write your first lines of code.</p>
+          </article>
+          <article class="card">
+            <h2>Functions</h2>
+            <p>Learn how to organize your code into reusable blocks with functions.</p>
+          </article>
+          <article class="card">
+            <h2>For Loops</h2>
+            <p>See how Python repeats tasks automatically with loop structures.</p>
+          </article>
+          <article class="card">
+            <h2>Conditionals</h2>
+            <p>Find out how to make decisions in your programs using if statements.</p>
+          </article>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

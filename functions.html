@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 4 — Python Functions</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f0d;
+    --surface: #141a14;
+    --surface2: #1c231c;
+    --border: #2a352a;
+    --accent: #7fff6e;
+    --accent2: #f7c948;
+    --accent3: #6eb5ff;
+    --text: #e8f0e8;
+    --muted: #607060;
+    --code-bg: #0a0f0a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  header {
+    padding: 60px 40px 40px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .top-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: rgba(10, 12, 18, 0.92);
+    padding: 0.85rem 0;
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .top-nav a {
+    color: #fff;
+    text-decoration: none;
+    padding: 0.55rem 0.95rem;
+    border-radius: 0.35rem;
+    background: rgba(255,255,255,0.08);
+    font-weight: 600;
+  }
+
+  .top-nav a:hover {
+    background: rgba(255,255,255,0.14);
+  }
+
+  header::before {
+    content: '';
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 420px; height: 420px;
+    background: radial-gradient(circle, rgba(127,255,110,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  header::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; left: 200px;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(110,181,255,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .day-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--accent);
+    color: #000;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 2px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  header h1 {
+    font-size: clamp(36px, 6vw, 64px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -2px;
+  }
+
+  header h1 span { color: var(--accent); }
+
+  .header-meta {
+    display: flex;
+    gap: 16px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+
+  .meta-pill {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    padding: 4px 12px;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+  }
+
+  main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 40px 80px;
+  }
+
+  .progress-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 24px;
+    border-radius: 4px;
+    margin-bottom: 40px;
+    margin-top: 40px;
+  }
+
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  .progress-bar {
+    height: 4px;
+    background: var(--surface2);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    width: 4%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 2px;
+    animation: fillUp 1.5s ease forwards;
+  }
+
+  @keyframes fillUp { from { width: 0; } to { width: 4%; } }
+
+  .hour-block { margin-bottom: 60px; }
+
+  .hour-label {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .hour-number {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .hour-divider { flex: 1; height: 1px; background: var(--border); }
+
+  .hour-title {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin-bottom: 4px;
+  }
+
+  /* CONCEPT CARDS */
+  .concept-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 28px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .concept-card:hover { border-color: var(--accent); }
+
+  .concept-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 100%;
+    background: var(--accent);
+  }
+
+  .concept-card.blue::before { background: var(--accent3); }
+  .concept-card.yellow::before { background: var(--accent2); }
+  .concept-card.purple::before { background: #c792ea; }
+
+  .concept-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .concept-title {
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+  }
+
+  .time-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    background: var(--surface2);
+    padding: 3px 10px;
+    border-radius: 2px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .explanation-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .explanation {
+    font-size: 14px;
+    color: #a0c0a0;
+    line-height: 1.7;
+    margin-bottom: 20px;
+  }
+
+  .explanation strong { color: var(--accent); font-weight: 600; }
+  .explanation em { color: var(--accent2); font-style: normal; font-weight: 600; }
+
+  /* ANALOGY BOX */
+  .analogy-box {
+    background: rgba(127,255,110,0.04);
+    border: 1px solid rgba(127,255,110,0.15);
+    border-radius: 4px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    color: #a0c0a0;
+    line-height: 1.7;
+  }
+
+  .analogy-box .analogy-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* CODE BLOCKS */
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 16px;
+  }
+
+  .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+  }
+
+  .code-dots { display: flex; gap: 6px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot.red { background: #ff5f57; }
+  .dot.yellow { background: #ffbd2e; }
+  .dot.green { background: #28c840; }
+
+  .code-filename {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .code-body {
+    padding: 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    line-height: 1.9;
+    overflow-x: auto;
+  }
+
+  .py-keyword { color: #c792ea; }
+  .py-func { color: #82aaff; }
+  .py-def { color: #7fff6e; }
+  .py-string { color: #c3e88d; }
+  .py-var { color: #f8b500; }
+  .py-comment { color: #4a6a4a; font-style: italic; }
+  .py-number { color: #f78c6c; }
+  .py-fstring { color: #89ddff; }
+  .py-param { color: #ffcb6b; }
+  .py-return { color: #f78c6c; }
+
+  .output-block {
+    background: #07090a;
+    border: 1px solid var(--border);
+    border-top: none;
+    padding: 16px 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    color: var(--accent);
+    line-height: 1.8;
+  }
+
+  .output-label {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  /* DIAGRAM */
+  .function-diagram {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 24px;
+    margin: 16px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .diag-box {
+    padding: 12px 20px;
+    border-radius: 3px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    text-align: center;
+    min-width: 120px;
+  }
+
+  .diag-input { background: rgba(110,181,255,0.1); border: 1px solid rgba(110,181,255,0.3); color: var(--accent3); }
+  .diag-func  { background: rgba(127,255,110,0.1); border: 1px solid rgba(127,255,110,0.3); color: var(--accent); }
+  .diag-output{ background: rgba(247,201,72,0.1); border: 1px solid rgba(247,201,72,0.3); color: var(--accent2); }
+
+  .diag-arrow {
+    color: var(--muted);
+    font-size: 20px;
+    line-height: 1;
+  }
+
+  .diag-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 4px;
+    letter-spacing: 1px;
+  }
+
+  /* EXERCISE BOX */
+  .exercise-box {
+    background: rgba(110,181,255,0.04);
+    border: 1px solid rgba(110,181,255,0.18);
+    border-radius: 4px;
+    padding: 16px 20px;
+    margin-top: 16px;
+  }
+
+  .exercise-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent3);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .exercise-label::before { content: '✦'; font-size: 12px; }
+
+  .exercise-text {
+    font-size: 14px;
+    color: #a0b8c8;
+    line-height: 1.6;
+  }
+
+  /* COMPARISON TABLE */
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+  }
+
+  .compare-table th {
+    text-align: left;
+    padding: 10px 16px;
+    background: var(--surface2);
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-size: 10px;
+    border: 1px solid var(--border);
+  }
+
+  .compare-table td {
+    padding: 11px 16px;
+    border: 1px solid var(--border);
+    vertical-align: top;
+    line-height: 1.5;
+    font-size: 12px;
+    color: #a0c0a0;
+  }
+
+  .compare-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+  /* PROJECT CARD */
+  .project-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 32px;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+
+  .project-card::after {
+    content: 'PROJECT';
+    position: absolute;
+    top: 20px; right: 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    background: rgba(127,255,110,0.08);
+    padding: 4px 10px;
+    border: 1px solid rgba(127,255,110,0.25);
+    border-radius: 2px;
+  }
+
+  .project-title {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin-bottom: 6px;
+  }
+
+  .project-subtitle {
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 24px;
+  }
+
+  /* CHECKLIST */
+  .checklist { list-style: none; margin-top: 20px; }
+
+  .checklist li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    color: #a0c0a0;
+    line-height: 1.5;
+  }
+
+  .checklist li:last-child { border-bottom: none; }
+
+  .check-box {
+    width: 18px; height: 18px;
+    border: 1.5px solid var(--border);
+    border-radius: 2px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  /* HOMEWORK */
+  .homework-card {
+    background: linear-gradient(135deg, rgba(127,255,110,0.05), rgba(110,181,255,0.03));
+    border: 1px solid rgba(127,255,110,0.22);
+    border-radius: 4px;
+    padding: 28px;
+  }
+
+  .homework-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--accent);
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+  }
+
+  .tweet-preview {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 20px;
+    margin-top: 16px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text);
+  }
+
+  .tweet-preview .hashtag { color: #4aa0f0; font-weight: 600; }
+
+  /* CALLOUT */
+  .callout {
+    background: rgba(247,201,72,0.05);
+    border: 1px solid rgba(247,201,72,0.2);
+    border-radius: 4px;
+    padding: 16px 20px;
+    margin: 16px 0;
+    font-size: 14px;
+    color: #c8b070;
+    line-height: 1.7;
+  }
+
+  .callout-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--accent2);
+    margin-bottom: 6px;
+  }
+
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  code {
+    background: var(--surface2);
+    padding: 2px 8px;
+    border-radius: 2px;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+  }
+</style>
+</head>
+<body>
+  <nav class="top-nav">
+    <a href="index.html">Home</a>
+    <a href="Intro.html">Intro</a>
+    <a href="functions.html">Functions</a>
+    <a href="forLoops.html">For Loops</a>
+    <a href="conditionals.html">Conditionals</a>
+  </nav>
+
+<header>
+  <div class="day-badge">100 Days of Code</div>
+  <h1>Writing<br><span>Functions</span></h1>
+  <div class="header-meta">
+    <div class="meta-pill">DAY 04</div>
+    <div class="meta-pill">2 HOURS</div>
+    <div class="meta-pill">BEGINNER</div>
+    <div class="meta-pill">#BUILDINPUBLIC</div>
+  </div>
+</header>
+
+<main>
+
+  <div class="progress-section">
+    <div class="progress-label">
+      <span>JOURNEY PROGRESS</span>
+      <span>DAY 4 / 100</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill"></div></div>
+  </div>
+
+  <!-- HOUR 1 -->
+  <div class="hour-block">
+    <div class="hour-label">
+      <div class="hour-number">Hour 01</div>
+      <div class="hour-divider"></div>
+    </div>
+    <div class="hour-title">Core Concepts & Guided Practice</div>
+
+    <!-- CONCEPT 1 -->
+    <div class="concept-card" style="margin-top:24px;">
+      <div class="concept-header">
+        <div class="concept-title">Concept 1 — What is a Function & Why Use One?</div>
+        <div class="time-tag">15 mins</div>
+      </div>
+
+      <div class="analogy-box">
+        <div class="analogy-label">💡 Real-World Analogy</div>
+        Think of a function like a <strong>vending machine</strong>. You press a button (call the function), maybe put in money (pass arguments), and it gives you a snack (returns a value). You don't need to know how it works inside — you just use it. The best part? You can use the same machine as many times as you want.
+      </div>
+
+      <div class="explanation-label">Why Functions Matter</div>
+      <div class="explanation">
+        Right now your code runs top-to-bottom, once. Functions let you <strong>name and save a block of code</strong> so you can run it anytime, from anywhere in your program — without copy-pasting. This is the single most important idea in all of programming: <em>Don't Repeat Yourself (DRY)</em>.
+      </div>
+
+      <div class="function-diagram">
+        <div>
+          <div class="diag-box diag-input">INPUT<br><span style="font-size:10px;color:#7090a0;">(arguments)</span></div>
+          <div class="diag-label">what you give it</div>
+        </div>
+        <div class="diag-arrow">→</div>
+        <div>
+          <div class="diag-box diag-func">FUNCTION<br><span style="font-size:10px;color:#50a050;">def greet()</span></div>
+          <div class="diag-label">the named block of code</div>
+        </div>
+        <div class="diag-arrow">→</div>
+        <div>
+          <div class="diag-box diag-output">OUTPUT<br><span style="font-size:10px;color:#a08030;">(return value)</span></div>
+          <div class="diag-label">what you get back</div>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div>
+          <div class="code-filename">without_functions.py</div>
+        </div>
+        <div class="code-body">
+<span class="py-comment"># WITHOUT functions — repetitive and messy</span><br>
+<span class="py-func">print</span>(<span class="py-string">"Hello, Alice! Welcome."</span>)<br>
+<span class="py-func">print</span>(<span class="py-string">"Hello, Bob! Welcome."</span>)<br>
+<span class="py-func">print</span>(<span class="py-string">"Hello, Carlos! Welcome."</span>)<br><br>
+<span class="py-comment"># WITH a function — clean and reusable ✓</span><br>
+<span class="py-keyword">def</span> <span class="py-def">greet</span>(<span class="py-param">name</span>):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-fstring">f"Hello, {<span class="py-param">name</span>}! Welcome."</span>)<br><br>
+<span class="py-def">greet</span>(<span class="py-string">"Alice"</span>)<br>
+<span class="py-def">greet</span>(<span class="py-string">"Bob"</span>)<br>
+<span class="py-def">greet</span>(<span class="py-string">"Carlos"</span>)
+        </div>
+      </div>
+      <div class="output-block">
+        <div class="output-label">Output (same result, less code)</div>
+        Hello, Alice! Welcome.<br>
+        Hello, Bob! Welcome.<br>
+        Hello, Carlos! Welcome.
+      </div>
+
+      <div class="exercise-box">
+        <div class="exercise-label">Exercise</div>
+        <div class="exercise-text">Write a function called <code>introduce()</code> that takes a <code>name</code> parameter and prints <em>"My name is [name] and I am a programmer!"</em> Call it three times with different names.</div>
+      </div>
+    </div>
+
+    <!-- CONCEPT 2 -->
+    <div class="concept-card blue">
+      <div class="concept-header">
+        <div class="concept-title">Concept 2 — Parameters, Arguments & Return Values</div>
+        <div class="time-tag">25 mins</div>
+      </div>
+
+      <div class="explanation-label">Beginner Explanation</div>
+      <div class="explanation">
+        A <strong>parameter</strong> is the variable name in the function definition — the placeholder. An <strong>argument</strong> is the actual value you pass in when you call it. The <em>return</em> keyword sends a value back out of the function so you can store or use it.
+      </div>
+
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>Term</th>
+            <th>Where it lives</th>
+            <th>Example</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="color:var(--accent);">Parameter</td>
+            <td>Inside the <code>def</code> line</td>
+            <td><code>def add(<span style="color:#ffcb6b;">a, b</span>):</code></td>
+          </tr>
+          <tr>
+            <td style="color:var(--accent2);">Argument</td>
+            <td>When you call the function</td>
+            <td><code>add(<span style="color:#f78c6c;">5, 3</span>)</code></td>
+          </tr>
+          <tr>
+            <td style="color:var(--accent3);">Return value</td>
+            <td>Sent back with <code>return</code></td>
+            <td><code>result = add(5, 3) → 8</code></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="code-block" style="margin-top:20px;">
+        <div class="code-header">
+          <div class="code-dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div>
+          <div class="code-filename">return_values.py</div>
+        </div>
+        <div class="code-body">
+<span class="py-comment"># A function that returns a value</span><br>
+<span class="py-keyword">def</span> <span class="py-def">add</span>(<span class="py-param">a</span>, <span class="py-param">b</span>):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">return</span> <span class="py-param">a</span> + <span class="py-param">b</span><br><br>
+<span class="py-comment"># Store the returned value in a variable</span><br>
+<span class="py-var">result</span> = <span class="py-def">add</span>(<span class="py-number">5</span>, <span class="py-number">3</span>)<br>
+<span class="py-func">print</span>(<span class="py-fstring">f"5 + 3 = {<span class="py-var">result</span>}"</span>)<br><br>
+<span class="py-comment"># You can also use it directly</span><br>
+<span class="py-func">print</span>(<span class="py-fstring">f"10 + 7 = {<span class="py-def">add</span>(<span class="py-number">10</span>, <span class="py-number">7</span>)}"</span>)<br><br>
+<span class="py-comment"># Default parameter — b defaults to 0 if not given</span><br>
+<span class="py-keyword">def</span> <span class="py-def">add_with_default</span>(<span class="py-param">a</span>, <span class="py-param">b</span>=<span class="py-number">0</span>):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">return</span> <span class="py-param">a</span> + <span class="py-param">b</span><br><br>
+<span class="py-func">print</span>(<span class="py-def">add_with_default</span>(<span class="py-number">10</span>))    <span class="py-comment"># → 10</span><br>
+<span class="py-func">print</span>(<span class="py-def">add_with_default</span>(<span class="py-number">10</span>, <span class="py-number">5</span>)) <span class="py-comment"># → 15</span>
+        </div>
+      </div>
+      <div class="output-block">
+        <div class="output-label">Output</div>
+        5 + 3 = 8<br>
+        10 + 7 = 17<br>
+        10<br>
+        15
+      </div>
+
+      <div class="callout">
+        <div class="callout-label">⚠️ KEY RULE</div>
+        A function <strong>without</strong> a <code>return</code> statement gives back <code>None</code>. If you try to store that result and use it, you'll get bugs. Always ask: "Does this function need to give something back?"
+      </div>
+
+      <div class="exercise-box">
+        <div class="exercise-label">Exercise</div>
+        <div class="exercise-text">Write three functions: <code>multiply(a, b)</code> that returns the product, <code>square(n)</code> that returns n×n, and <code>full_name(first, last)</code> that returns the full name as a string. Print the result of calling each one.</div>
+      </div>
+    </div>
+
+    <!-- CONCEPT 3 -->
+    <div class="concept-card yellow">
+      <div class="concept-header">
+        <div class="concept-title">Concept 3 — Scope: Where Variables Live</div>
+        <div class="time-tag">20 mins</div>
+      </div>
+
+      <div class="explanation-label">Beginner Explanation</div>
+      <div class="explanation">
+        Scope is about <strong>where a variable can be seen</strong>. A variable created inside a function is <em>local</em> — it only exists inside that function. A variable created outside is <em>global</em> — visible everywhere. Think of a function as a private room: what happens inside, stays inside.
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div>
+          <div class="code-filename">scope.py</div>
+        </div>
+        <div class="code-body">
+<span class="py-var">game_title</span> = <span class="py-string">"Python Quest"</span>  <span class="py-comment"># GLOBAL — visible everywhere</span><br><br>
+<span class="py-keyword">def</span> <span class="py-def">start_game</span>():<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">score</span> = <span class="py-number">0</span>               <span class="py-comment"># LOCAL — only inside this function</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-fstring">f"Starting {<span class="py-var">game_title</span>}!"</span>) <span class="py-comment"># ✓ can read global</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-fstring">f"Score: {<span class="py-var">score</span>}"</span>)<br><br>
+<span class="py-def">start_game</span>()<br><br>
+<span class="py-comment"># print(score)  ← ERROR! score doesn't exist out here</span>
+        </div>
+      </div>
+
+      <div class="exercise-box">
+        <div class="exercise-label">Exercise</div>
+        <div class="exercise-text">Create a global variable <code>player_name = "Hero"</code>. Write a function <code>show_stats()</code> that creates a local variable <code>level = 1</code> and prints both. Then try printing <code>level</code> outside the function and observe the error — understanding errors is part of learning!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOUR 2 -->
+  <div class="hour-block">
+    <div class="hour-label">
+      <div class="hour-number">Hour 02</div>
+      <div class="hour-divider"></div>
+    </div>
+    <div class="hour-title">Practical Application & Building in Public</div>
+
+    <!-- PROJECT -->
+    <div class="project-card" style="margin-top:24px;">
+      <div class="project-title">The Personal Calculator</div>
+      <div class="project-subtitle">A function-powered menu app — 40 mins</div>
+
+      <div class="explanation" style="margin-bottom:0;">
+        Build a calculator where <strong>every operation is its own function</strong>. This forces you to practice defining functions, passing arguments, and using return values — all in one cohesive program.
+      </div>
+
+      <div class="code-block" style="margin-top:20px;">
+        <div class="code-header">
+          <div class="code-dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div>
+          <div class="code-filename">calculator.py</div>
+        </div>
+        <div class="code-body">
+<span class="py-comment"># Personal Calculator — Day 4 Project</span><br>
+<span class="py-comment"># Each operation is its own function</span><br><br>
+<span class="py-keyword">def</span> <span class="py-def">add</span>(<span class="py-param">a</span>, <span class="py-param">b</span>):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">return</span> <span class="py-param">a</span> + <span class="py-param">b</span><br><br>
+<span class="py-keyword">def</span> <span class="py-def">subtract</span>(<span class="py-param">a</span>, <span class="py-param">b</span>):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">return</span> <span class="py-param">a</span> - <span class="py-param">b</span><br><br>
+<span class="py-keyword">def</span> <span class="py-def">multiply</span>(<span class="py-param">a</span>, <span class="py-param">b</span>):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">return</span> <span class="py-param">a</span> * <span class="py-param">b</span><br><br>
+<span class="py-keyword">def</span> <span class="py-def">divide</span>(<span class="py-param">a</span>, <span class="py-param">b</span>):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">if</span> <span class="py-param">b</span> == <span class="py-number">0</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">return</span> <span class="py-string">"Error: Can't divide by zero!"</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">return</span> <span class="py-param">a</span> / <span class="py-param">b</span><br><br>
+<span class="py-keyword">def</span> <span class="py-def">show_menu</span>():<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-string">"\n=== PERSONAL CALCULATOR ==="</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-string">"1. Add"</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-string">"2. Subtract"</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-string">"3. Multiply"</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-string">"4. Divide"</span>)<br><br>
+<span class="py-comment"># --- Main Program ---</span><br>
+<span class="py-def">show_menu</span>()<br>
+<span class="py-var">choice</span> = <span class="py-func">input</span>(<span class="py-string">"Choose an option (1-4): "</span>)<br>
+<span class="py-var">num1</span> = <span class="py-func">float</span>(<span class="py-func">input</span>(<span class="py-string">"Enter first number: "</span>))<br>
+<span class="py-var">num2</span> = <span class="py-func">float</span>(<span class="py-func">input</span>(<span class="py-string">"Enter second number: "</span>))<br><br>
+<span class="py-keyword">if</span> <span class="py-var">choice</span> == <span class="py-string">"1"</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-fstring">f"Result: {<span class="py-def">add</span>(<span class="py-var">num1</span>, <span class="py-var">num2</span>)}"</span>)<br>
+<span class="py-keyword">elif</span> <span class="py-var">choice</span> == <span class="py-string">"2"</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-fstring">f"Result: {<span class="py-def">subtract</span>(<span class="py-var">num1</span>, <span class="py-var">num2</span>)}"</span>)<br>
+<span class="py-keyword">elif</span> <span class="py-var">choice</span> == <span class="py-string">"3"</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-fstring">f"Result: {<span class="py-def">multiply</span>(<span class="py-var">num1</span>, <span class="py-var">num2</span>)}"</span>)<br>
+<span class="py-keyword">elif</span> <span class="py-var">choice</span> == <span class="py-string">"4"</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-fstring">f"Result: {<span class="py-def">divide</span>(<span class="py-var">num1</span>, <span class="py-var">num2</span>)}"</span>)<br>
+<span class="py-keyword">else</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-string">"Invalid choice!"</span>)
+        </div>
+      </div>
+
+      <div class="output-block">
+        <div class="output-label">Example Terminal Session</div>
+        === PERSONAL CALCULATOR ===<br>
+        1. Add &nbsp; 2. Subtract &nbsp; 3. Multiply &nbsp; 4. Divide<br><br>
+        Choose an option (1-4): <span style="color:var(--accent2)">4</span><br>
+        Enter first number: <span style="color:var(--accent2)">20</span><br>
+        Enter second number: <span style="color:var(--accent2)">4</span><br>
+        Result: 5.0
+      </div>
+
+      <div class="callout" style="margin-top:20px;">
+        <div class="callout-label">🔥 STRETCH CHALLENGE</div>
+        Add a <code>power(base, exponent)</code> function that returns <em>base</em> raised to the power of <em>exponent</em>. Add it as option 5 in the menu. Hint: Python uses <code>**</code> for exponents — e.g. <code>2 ** 3</code> gives <code>8</code>.
+      </div>
+
+      <ul class="checklist">
+        <li><div class="check-box"></div>At least 4 separate functions defined with <code>def</code></li>
+        <li><div class="check-box"></div>All functions use parameters and <code>return</code> values</li>
+        <li><div class="check-box"></div>The divide function handles the divide-by-zero case</li>
+        <li><div class="check-box"></div>Menu is displayed using its own <code>show_menu()</code> function</li>
+        <li><div class="check-box"></div>Program runs end-to-end without crashing</li>
+        <li><div class="check-box"></div>Stretch: <code>power()</code> function added as option 5</li>
+      </ul>
+    </div>
+
+    <!-- HOMEWORK -->
+    <div class="homework-card">
+      <div class="homework-title">🚀 Build in Public — Homework</div>
+      <div style="font-size:14px;color:#90b890;margin-bottom:20px;line-height:1.7;">
+        Three steps before Day 5. Keep the streak alive.
+      </div>
+
+      <ul class="checklist">
+        <li><div class="check-box"></div><div><strong style="color:var(--text);">GitHub:</strong> Add <code>calculator.py</code> to your <code>Python-Learning-Journey</code> repo with commit message: <em>"Day 4: Function-powered calculator"</em></div></li>
+        <li><div class="check-box"></div><div><strong style="color:var(--text);">Screenshot:</strong> Capture both your code and the terminal session showing a calculation. CodeSnap for the code, Snipping Tool for the output.</div></li>
+        <li><div class="check-box"></div><div><strong style="color:var(--text);">Post on X:</strong> Use the caption below — feel free to make it your own!</div></li>
+      </ul>
+
+      <div class="tweet-preview">
+        Day 4 of my coding journey! Learned about Python functions today — how to write reusable blocks of code that take inputs and return outputs. Built a working calculator from scratch using nothing but functions. It's starting to click. 🧠 <span class="hashtag">#100DaysOfCode</span> <span class="hashtag">#Python</span> <span class="hashtag">#BuildInPublic</span>
+      </div>
+    </div>
+  </div>
+
+</main>
+</body>
+</html>
