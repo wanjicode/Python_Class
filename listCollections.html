@@ -539,12 +539,46 @@
     font-size: 13px;
   }
 
+  .top-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: rgba(10, 12, 18, 0.92);
+    padding: 0.85rem 0;
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .top-nav a {
+    color: #fff;
+    text-decoration: none;
+    padding: 0.55rem 0.95rem;
+    border-radius: 0.35rem;
+    background: rgba(255,255,255,0.08);
+    font-weight: 600;
+  }
+
+  .top-nav a:hover {
+    background: rgba(255,255,255,0.14);
+  }
+
   ::-webkit-scrollbar { width: 6px; height: 6px; }
   ::-webkit-scrollbar-track { background: var(--bg); }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 </style>
 </head>
 <body>
+  <nav class="top-nav">
+    <a href="index.html">Home</a>
+    <a href="Intro.html">Intro</a>
+    <a href="functions.html">Functions</a>
+    <a href="forLoops.html">For Loops</a>
+    <a href="conditionals.html">Conditionals</a>
+    <a href="listCollections.html">List Collections</a>
+  </nav>
 
 <header>
   <div class="topic-badge">Python Fundamentals</div>
