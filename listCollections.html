@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lists & Collections — Python</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0d14;
+    --surface: #16131e;
+    --surface2: #1e1a28;
+    --border: #2e2840;
+    --accent: #e879f9;
+    --accent2: #34d399;
+    --accent3: #fbbf24;
+    --text: #f0e8f8;
+    --muted: #6b5f80;
+    --code-bg: #0a0810;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  header {
+    padding: 60px 40px 40px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  header::before {
+    content: '';
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 440px; height: 440px;
+    background: radial-gradient(circle, rgba(232,121,249,0.09) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  header::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; left: 160px;
+    width: 320px; height: 320px;
+    background: radial-gradient(circle, rgba(52,211,153,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .topic-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--accent);
+    color: #000;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 2px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  header h1 {
+    font-size: clamp(36px, 6vw, 64px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -2px;
+  }
+
+  header h1 span { color: var(--accent); }
+
+  .header-sub {
+    font-size: 16px;
+    color: var(--muted);
+    margin-top: 14px;
+    max-width: 560px;
+    line-height: 1.6;
+  }
+
+  .header-meta {
+    display: flex;
+    gap: 16px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+
+  .meta-pill {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    padding: 4px 12px;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+  }
+
+  main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 40px 80px;
+  }
+
+  /* GOAL CARD */
+  .goal-card {
+    background: rgba(232,121,249,0.05);
+    border: 1px solid rgba(232,121,249,0.2);
+    border-radius: 4px;
+    padding: 24px;
+    margin-top: 40px;
+    margin-bottom: 40px;
+  }
+
+  .goal-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+
+  .goal-text {
+    font-size: 15px;
+    color: #c0a0d0;
+    line-height: 1.7;
+  }
+
+  .goal-text strong { color: var(--text); }
+
+  /* SECTION HEADERS */
+  .section-label {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+    margin-top: 48px;
+  }
+
+  .section-number {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .section-divider { flex: 1; height: 1px; background: var(--border); }
+
+  .section-title {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin-bottom: 6px;
+  }
+
+  /* CONCEPT CARDS */
+  .concept-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 28px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .concept-card:hover { border-color: var(--accent); }
+  .concept-card::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: var(--accent); }
+  .concept-card.green::before { background: var(--accent2); }
+  .concept-card.yellow::before { background: var(--accent3); }
+
+  .concept-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .concept-title { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; }
+
+  .time-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    background: var(--surface2);
+    padding: 3px 10px;
+    border-radius: 2px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* SPEAK DIRECTLY TO STUDENT */
+  .student-voice {
+    font-size: 15px;
+    color: #b090c8;
+    line-height: 1.75;
+    margin-bottom: 20px;
+  }
+
+  .student-voice strong { color: var(--accent); font-weight: 600; }
+  .student-voice em { color: var(--accent2); font-style: normal; font-weight: 600; }
+
+  /* ANALOGY */
+  .analogy-box {
+    background: rgba(232,121,249,0.04);
+    border: 1px solid rgba(232,121,249,0.14);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 4px 4px 0;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    color: #a888b8;
+    line-height: 1.7;
+  }
+
+  .analogy-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+
+  /* CODE BLOCKS */
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 16px;
+  }
+
+  .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+  }
+
+  .code-dots { display: flex; gap: 6px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot.red { background: #ff5f57; }
+  .dot.yellow { background: #ffbd2e; }
+  .dot.green { background: #28c840; }
+
+  .code-filename { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted); }
+
+  .code-body {
+    padding: 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    line-height: 1.9;
+    overflow-x: auto;
+  }
+
+  .py-keyword { color: #c792ea; }
+  .py-func { color: #82aaff; }
+  .py-def { color: #e879f9; }
+  .py-string { color: #c3e88d; }
+  .py-var { color: #f8b500; }
+  .py-comment { color: #3d3550; font-style: italic; }
+  .py-number { color: #f78c6c; }
+  .py-fstring { color: #89ddff; }
+  .py-param { color: #ffcb6b; }
+  .py-op { color: #fb923c; }
+  .py-index { color: #34d399; }
+  .py-method { color: #e879f9; }
+
+  .output-block {
+    background: #07050e;
+    border: 1px solid var(--border);
+    border-top: none;
+    padding: 16px 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    color: var(--accent2);
+    line-height: 1.8;
+  }
+
+  .output-label { font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; }
+
+  /* INDEX DIAGRAM */
+  .index-diagram {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 24px 20px;
+    margin: 16px 0;
+    overflow-x: auto;
+  }
+
+  .index-row {
+    display: flex;
+    gap: 0;
+    justify-content: center;
+    margin-bottom: 8px;
+  }
+
+  .index-cell {
+    width: 80px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    border: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .index-cell.value { background: rgba(232,121,249,0.08); color: var(--text); }
+  .index-cell.pos-index { background: rgba(52,211,153,0.06); color: var(--accent2); font-size: 11px; }
+  .index-cell.neg-index { background: rgba(251,191,36,0.06); color: var(--accent3); font-size: 11px; }
+
+  .index-diagram-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 12px;
+  }
+
+  .index-legend {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+  }
+
+  .legend-item {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .legend-dot {
+    width: 10px; height: 10px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  /* METHODS TABLE */
+  .methods-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+  }
+
+  .methods-table th {
+    text-align: left;
+    padding: 10px 16px;
+    background: var(--surface2);
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-size: 10px;
+    border: 1px solid var(--border);
+  }
+
+  .methods-table td {
+    padding: 11px 16px;
+    border: 1px solid var(--border);
+    vertical-align: top;
+    line-height: 1.6;
+    color: #a090b8;
+    font-size: 12px;
+  }
+
+  .methods-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .method-name { color: var(--accent); font-weight: 700; }
+
+  /* TRY IT BOX */
+  .try-it {
+    background: rgba(52,211,153,0.04);
+    border: 1px solid rgba(52,211,153,0.18);
+    border-radius: 4px;
+    padding: 18px 20px;
+    margin-top: 18px;
+  }
+
+  .try-it-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent2);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .try-it-label::before { content: '▶'; font-size: 10px; }
+  .try-it-text { font-size: 14px; color: #70a890; line-height: 1.7; }
+
+  /* CALLOUT */
+  .callout {
+    background: rgba(251,191,36,0.05);
+    border: 1px solid rgba(251,191,36,0.2);
+    border-radius: 4px;
+    padding: 16px 20px;
+    margin: 16px 0;
+    font-size: 14px;
+    color: #a09050;
+    line-height: 1.7;
+  }
+
+  .callout-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--accent3);
+    margin-bottom: 6px;
+  }
+
+  .callout.danger {
+    background: rgba(251,113,133,0.05);
+    border-color: rgba(251,113,133,0.2);
+    color: #a07070;
+  }
+
+  .callout.danger .callout-label { color: #fb7185; }
+
+  /* PROJECT CARD */
+  .project-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 32px;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+
+  .project-banner {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+  }
+
+  .project-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    background: rgba(232,121,249,0.08);
+    padding: 4px 10px;
+    border: 1px solid rgba(232,121,249,0.22);
+    border-radius: 2px;
+    display: inline-block;
+    margin-bottom: 16px;
+  }
+
+  .project-title { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 6px; }
+  .project-subtitle { font-size: 14px; color: var(--muted); margin-bottom: 20px; }
+
+  /* CHECKLIST */
+  .checklist { list-style: none; margin-top: 20px; }
+
+  .checklist li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    color: #9080a8;
+    line-height: 1.5;
+  }
+
+  .checklist li:last-child { border-bottom: none; }
+
+  .check-box {
+    width: 18px; height: 18px;
+    border: 1.5px solid var(--border);
+    border-radius: 2px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+
+  .check-box:hover { border-color: var(--accent); }
+
+  /* HOMEWORK */
+  .homework-card {
+    background: linear-gradient(135deg, rgba(232,121,249,0.05), rgba(52,211,153,0.03));
+    border: 1px solid rgba(232,121,249,0.2);
+    border-radius: 4px;
+    padding: 28px;
+    margin-top: 20px;
+  }
+
+  .homework-title { font-size: 20px; font-weight: 800; color: var(--accent); margin-bottom: 8px; letter-spacing: -0.5px; }
+
+  .tweet-preview {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 20px;
+    margin-top: 16px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text);
+  }
+
+  .tweet-preview .hashtag { color: #4aa0f0; font-weight: 600; }
+
+  code {
+    background: var(--surface2);
+    padding: 2px 8px;
+    border-radius: 2px;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+  }
+
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="topic-badge">Python Fundamentals</div>
+  <h1>Lists &<br><span>Collections</span></h1>
+  <div class="header-sub">How to store, organise, and work with multiple pieces of data at once.</div>
+  <div class="header-meta">
+    <div class="meta-pill">2 HOURS</div>
+    <div class="meta-pill">LISTS · INDEXING · METHODS</div>
+    <div class="meta-pill">#BUILDINPUBLIC</div>
+  </div>
+</header>
+
+<main>
+
+  <!-- GOAL -->
+  <div class="goal-card">
+    <div class="goal-label">🎯 What You'll Be Able to Do After This</div>
+    <div class="goal-text">
+      By the end of today you'll know how to <strong>store a collection of items in one variable</strong>, grab specific items out of it, change it, loop through it, and use built-in methods to sort, add, and remove things. This is one of the most used features in all of Python — and it's the foundation of how AI systems handle batches of data, messages, and results.
+    </div>
+  </div>
+
+  <!-- SECTION 1 -->
+  <div class="section-label">
+    <div class="section-number">Part 01</div>
+    <div class="section-divider"></div>
+  </div>
+  <div class="section-title">Understanding Lists</div>
+
+  <!-- CONCEPT 1 -->
+  <div class="concept-card" style="margin-top:24px;">
+    <div class="concept-header">
+      <div class="concept-title">What is a List?</div>
+      <div class="time-tag">15 mins</div>
+    </div>
+
+    <div class="analogy-box">
+      <div class="analogy-label">💡 Think of it this way</div>
+      Imagine you're packing a bag for a trip. Instead of carrying each item in a separate hand, you put everything into <strong>one bag</strong>. A list in Python is that bag — it holds multiple items inside a single variable, in order, so you can carry them all around together.
+    </div>
+
+    <div class="student-voice">
+      Up until now, each variable you've created has held <strong>one thing</strong> — one name, one number, one string. A <em>list</em> lets a single variable hold <strong>as many things as you want</strong>, all in a specific order. You create a list using square brackets <code>[]</code> with items separated by commas.
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div>
+        <div class="code-filename">lists_intro.py</div>
+      </div>
+      <div class="code-body">
+<span class="py-comment"># A variable holding ONE thing</span><br>
+<span class="py-var">tool</span> = <span class="py-string">"Python"</span><br><br>
+<span class="py-comment"># A list holding MANY things</span><br>
+<span class="py-var">tools</span> = [<span class="py-string">"Python"</span>, <span class="py-string">"VS Code"</span>, <span class="py-string">"Git"</span>, <span class="py-string">"GitHub"</span>]<br><br>
+<span class="py-comment"># Lists can hold different types too</span><br>
+<span class="py-var">mixed</span> = [<span class="py-string">"Marcus"</span>, <span class="py-number">18</span>, <span class="py-keyword">True</span>, <span class="py-number">9.5</span>]<br><br>
+<span class="py-comment"># Check how many items are in a list</span><br>
+<span class="py-func">print</span>(<span class="py-func">len</span>(<span class="py-var">tools</span>))   <span class="py-comment"># → 4</span><br>
+<span class="py-func">print</span>(<span class="py-func">len</span>(<span class="py-var">mixed</span>))   <span class="py-comment"># → 4</span>
+      </div>
+    </div>
+    <div class="output-block">
+      <div class="output-label">Output</div>
+      4<br>4
+    </div>
+
+    <div class="try-it">
+      <div class="try-it-label">Try It</div>
+      <div class="try-it-text">Create a list called <code>my_goals</code> with at least 4 things you want to build or learn in tech. Print the list and use <code>len()</code> to print how many goals you have. Then create a second list called <code>ai_tools</code> with the names of 3 AI tools you've heard of.</div>
+    </div>
+  </div>
+
+  <!-- CONCEPT 2: Indexing -->
+  <div class="concept-card green">
+    <div class="concept-header">
+      <div class="concept-title">Accessing Items — Indexing & Slicing</div>
+      <div class="time-tag">20 mins</div>
+    </div>
+
+    <div class="student-voice">
+      Every item in a list has an <strong>address</strong> called an index. Python always starts counting from <em>zero</em> — so the first item is at index 0, the second at index 1, and so on. You access items using square brackets: <code>list[index]</code>.
+    </div>
+
+    <div class="index-diagram">
+      <div class="index-diagram-label">skills = ["Python", "Git", "APIs", "AI", "Deploy"]</div>
+      <div class="index-row">
+        <div class="index-cell value">"Python"</div>
+        <div class="index-cell value">"Git"</div>
+        <div class="index-cell value">"APIs"</div>
+        <div class="index-cell value">"AI"</div>
+        <div class="index-cell value">"Deploy"</div>
+      </div>
+      <div class="index-row">
+        <div class="index-cell pos-index">0</div>
+        <div class="index-cell pos-index">1</div>
+        <div class="index-cell pos-index">2</div>
+        <div class="index-cell pos-index">3</div>
+        <div class="index-cell pos-index">4</div>
+      </div>
+      <div class="index-row">
+        <div class="index-cell neg-index">-5</div>
+        <div class="index-cell neg-index">-4</div>
+        <div class="index-cell neg-index">-3</div>
+        <div class="index-cell neg-index">-2</div>
+        <div class="index-cell neg-index">-1</div>
+      </div>
+      <div class="index-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:rgba(52,211,153,0.4);"></div><span style="color:var(--accent2);">positive index (from start)</span></div>
+        <div class="legend-item"><div class="legend-dot" style="background:rgba(251,191,36,0.4);"></div><span style="color:var(--accent3);">negative index (from end)</span></div>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div>
+        <div class="code-filename">indexing.py</div>
+      </div>
+      <div class="code-body">
+<span class="py-var">skills</span> = [<span class="py-string">"Python"</span>, <span class="py-string">"Git"</span>, <span class="py-string">"APIs"</span>, <span class="py-string">"AI"</span>, <span class="py-string">"Deploy"</span>]<br><br>
+<span class="py-comment"># Grab specific items by index</span><br>
+<span class="py-func">print</span>(<span class="py-var">skills</span>[<span class="py-index">0</span>])    <span class="py-comment"># → Python (first item)</span><br>
+<span class="py-func">print</span>(<span class="py-var">skills</span>[<span class="py-index">3</span>])    <span class="py-comment"># → AI</span><br>
+<span class="py-func">print</span>(<span class="py-var">skills</span>[<span class="py-index">-1</span>])   <span class="py-comment"># → Deploy (last item)</span><br>
+<span class="py-func">print</span>(<span class="py-var">skills</span>[<span class="py-index">-2</span>])   <span class="py-comment"># → AI (second from last)</span><br><br>
+<span class="py-comment"># Slicing — grab a chunk of the list</span><br>
+<span class="py-func">print</span>(<span class="py-var">skills</span>[<span class="py-index">1</span>:<span class="py-index">3</span>])  <span class="py-comment"># → ['Git', 'APIs'] (index 1 up to but NOT 3)</span><br>
+<span class="py-func">print</span>(<span class="py-var">skills</span>[:<span class="py-index">2</span>])   <span class="py-comment"># → ['Python', 'Git'] (from start to index 2)</span><br>
+<span class="py-func">print</span>(<span class="py-var">skills</span>[<span class="py-index">2</span>:])   <span class="py-comment"># → ['APIs', 'AI', 'Deploy'] (from index 2 to end)</span><br><br>
+<span class="py-comment"># Update an item</span><br>
+<span class="py-var">skills</span>[<span class="py-index">2</span>] = <span class="py-string">"REST APIs"</span><br>
+<span class="py-func">print</span>(<span class="py-var">skills</span>)
+      </div>
+    </div>
+    <div class="output-block">
+      <div class="output-label">Output</div>
+      Python<br>AI<br>Deploy<br>AI<br>['Git', 'APIs']<br>['Python', 'Git']<br>['APIs', 'AI', 'Deploy']<br>['Python', 'Git', 'REST APIs', 'AI', 'Deploy']
+    </div>
+
+    <div class="callout danger">
+      <div class="callout-label">⚠️ IndexError — The Most Common List Bug</div>
+      If you try to access an index that doesn't exist — like <code>skills[10]</code> on a 5-item list — Python throws an <strong>IndexError</strong>. Always remember: a list with 5 items has indices 0 through 4. The last valid index is always <code>len(list) - 1</code>.
+    </div>
+
+    <div class="try-it">
+      <div class="try-it-label">Try It</div>
+      <div class="try-it-text">Using your <code>my_goals</code> list from the last exercise: print the first goal, the last goal using a negative index, and a slice of the middle goals. Then update one goal to something more specific. Use f-strings: <em>"My first goal is: [goal]"</em></div>
+    </div>
+  </div>
+
+  <!-- CONCEPT 3: Methods -->
+  <div class="concept-card yellow">
+    <div class="concept-header">
+      <div class="concept-title">List Methods — Making Lists Do Things</div>
+      <div class="time-tag">25 mins</div>
+    </div>
+
+    <div class="student-voice">
+      A <strong>method</strong> is a function that belongs to an object. Lists come with a set of built-in methods you can call using dot notation: <code>list.method()</code>. These let you add, remove, sort, and manipulate your list without writing extra code from scratch.
+    </div>
+
+    <table class="methods-table">
+      <thead>
+        <tr><th>Method</th><th>What it does</th><th>Example</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="method-name">.append(x)</span></td><td>Adds x to the end</td><td><code>tools.append("Docker")</code></td></tr>
+        <tr><td><span class="method-name">.insert(i, x)</span></td><td>Adds x at index i</td><td><code>tools.insert(0, "Linux")</code></td></tr>
+        <tr><td><span class="method-name">.remove(x)</span></td><td>Removes first occurrence of x</td><td><code>tools.remove("Git")</code></td></tr>
+        <tr><td><span class="method-name">.pop()</span></td><td>Removes & returns the last item</td><td><code>last = tools.pop()</code></td></tr>
+        <tr><td><span class="method-name">.sort()</span></td><td>Sorts the list in place</td><td><code>tools.sort()</code></td></tr>
+        <tr><td><span class="method-name">.reverse()</span></td><td>Reverses the list in place</td><td><code>tools.reverse()</code></td></tr>
+        <tr><td><span class="method-name">.index(x)</span></td><td>Returns the index of x</td><td><code>tools.index("Python")</code></td></tr>
+        <tr><td><span class="method-name">.count(x)</span></td><td>Counts how many times x appears</td><td><code>tools.count("Python")</code></td></tr>
+        <tr><td><span class="method-name">in</span></td><td>Checks if item exists (True/False)</td><td><code>"Python" in tools</code></td></tr>
+      </tbody>
+    </table>
+
+    <div class="code-block" style="margin-top:20px;">
+      <div class="code-header">
+        <div class="code-dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div>
+        <div class="code-filename">list_methods.py</div>
+      </div>
+      <div class="code-body">
+<span class="py-var">playlist</span> = [<span class="py-string">"Track 1"</span>, <span class="py-string">"Track 2"</span>, <span class="py-string">"Track 3"</span>]<br><br>
+<span class="py-comment"># Add a new track</span><br>
+<span class="py-var">playlist</span>.<span class="py-method">append</span>(<span class="py-string">"Track 4"</span>)<br>
+<span class="py-func">print</span>(<span class="py-var">playlist</span>)  <span class="py-comment"># → [..., 'Track 4']</span><br><br>
+<span class="py-comment"># Remove a track</span><br>
+<span class="py-var">playlist</span>.<span class="py-method">remove</span>(<span class="py-string">"Track 2"</span>)<br>
+<span class="py-func">print</span>(<span class="py-var">playlist</span>)  <span class="py-comment"># → ['Track 1', 'Track 3', 'Track 4']</span><br><br>
+<span class="py-comment"># Check if something is in the list — returns True/False</span><br>
+<span class="py-func">print</span>(<span class="py-string">"Track 1"</span> <span class="py-keyword">in</span> <span class="py-var">playlist</span>)   <span class="py-comment"># → True</span><br>
+<span class="py-func">print</span>(<span class="py-string">"Track 99"</span> <span class="py-keyword">in</span> <span class="py-var">playlist</span>)  <span class="py-comment"># → False</span><br><br>
+<span class="py-comment"># Combine with a conditional</span><br>
+<span class="py-keyword">if</span> <span class="py-string">"Track 1"</span> <span class="py-keyword">in</span> <span class="py-var">playlist</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-string">"Track 1 is queued up!"</span>)
+      </div>
+    </div>
+    <div class="output-block">
+      <div class="output-label">Output</div>
+      ['Track 1', 'Track 2', 'Track 3', 'Track 4']<br>
+      ['Track 1', 'Track 3', 'Track 4']<br>
+      True<br>False<br>
+      Track 1 is queued up!
+    </div>
+
+    <div class="try-it">
+      <div class="try-it-label">Try It</div>
+      <div class="try-it-text">Create a <code>shopping_list</code> with 3 items. Then: add 2 more with <code>.append()</code>, remove one with <code>.remove()</code>, check if a specific item <code>in</code> the list using a conditional, and print the final list with a <code>for</code> loop that says <em>"Don't forget: [item]"</em> for each one.</div>
+    </div>
+  </div>
+
+  <!-- SECTION 2 -->
+  <div class="section-label">
+    <div class="section-number">Part 02</div>
+    <div class="section-divider"></div>
+  </div>
+  <div class="section-title">Looping Through Lists</div>
+
+  <div class="concept-card" style="margin-top:24px;">
+    <div class="concept-header">
+      <div class="concept-title">Lists + Loops — The Most Common Combination in Python</div>
+      <div class="time-tag">20 mins</div>
+    </div>
+
+    <div class="student-voice">
+      In real programs — and in AI automations — you almost always have a <strong>list of things to process</strong>: a list of messages to analyse, a list of files to read, a list of API results to check. The <code>for</code> loop + list combination is the engine that powers most of that work.
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div>
+        <div class="code-filename">loops_and_lists.py</div>
+      </div>
+      <div class="code-body">
+<span class="py-comment"># Loop through every item in a list</span><br>
+<span class="py-var">messages</span> = [<span class="py-string">"hello"</span>, <span class="py-string">"need help"</span>, <span class="py-string">"bye"</span>, <span class="py-string">"what is AI?"</span>]<br><br>
+<span class="py-keyword">for</span> <span class="py-var">msg</span> <span class="py-keyword">in</span> <span class="py-var">messages</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-fstring">f"Processing: {<span class="py-var">msg</span>}"</span>)<br><br>
+<span class="py-comment"># Loop with enumerate() — get index AND value</span><br>
+<span class="py-keyword">for</span> <span class="py-var">i</span>, <span class="py-var">msg</span> <span class="py-keyword">in</span> <span class="py-func">enumerate</span>(<span class="py-var">messages</span>):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-fstring">f"Message {<span class="py-var">i</span>+<span class="py-number">1</span>}: {<span class="py-var">msg</span>}"</span>)<br><br>
+<span class="py-comment"># Build a new list using a loop</span><br>
+<span class="py-var">urgent</span> = []<br>
+<span class="py-keyword">for</span> <span class="py-var">msg</span> <span class="py-keyword">in</span> <span class="py-var">messages</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">if</span> <span class="py-string">"help"</span> <span class="py-keyword">in</span> <span class="py-var">msg</span> <span class="py-keyword">or</span> <span class="py-string">"bye"</span> <span class="py-keyword">in</span> <span class="py-var">msg</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">urgent</span>.<span class="py-method">append</span>(<span class="py-var">msg</span>)<br><br>
+<span class="py-func">print</span>(<span class="py-fstring">f"Priority messages: {<span class="py-var">urgent</span>}"</span>)
+      </div>
+    </div>
+    <div class="output-block">
+      <div class="output-label">Output</div>
+      Processing: hello<br>
+      Processing: need help<br>
+      Processing: bye<br>
+      Processing: what is AI?<br>
+      Message 1: hello<br>
+      Message 2: need help<br>
+      Message 3: bye<br>
+      Message 4: what is AI?<br>
+      Priority messages: ['need help', 'bye']
+    </div>
+
+    <div class="callout">
+      <div class="callout-label">🔗 THIS IS AI AUTOMATION IN MINIATURE</div>
+      That last block of code — looping through messages, checking a condition, collecting matching ones into a new list — is <strong>exactly</strong> how an AI automation filters emails, support tickets, or chat messages. You just built the logic skeleton of a real triage system.
+    </div>
+
+    <div class="try-it">
+      <div class="try-it-label">Try It</div>
+      <div class="try-it-text">Create a list of 6 numbers. Write a loop that goes through each one and builds two new lists: <code>evens</code> and <code>odds</code>, using the <code>%</code> operator from last session. At the end, print both lists with f-strings.</div>
+    </div>
+  </div>
+
+  <!-- SECTION 3 — PROJECT -->
+  <div class="section-label">
+    <div class="section-number">Part 03</div>
+    <div class="section-divider"></div>
+  </div>
+  <div class="section-title">Today's Project</div>
+
+  <div class="project-card" style="margin-top:24px;">
+    <div class="project-banner"></div>
+    <div class="project-label">BUILD</div>
+    <div class="project-title">The AI Skill Tracker</div>
+    <div class="project-subtitle">A personal learning dashboard using lists, loops, functions & conditionals — 40 mins</div>
+
+    <div class="student-voice" style="margin-bottom:0;">
+      You're going to build a program that manages your AI engineering learning journey. It will store skills in a list, let you add new ones, mark skills as learned, and show a progress report. This is a real mini-app — and it uses <strong>everything you've learned so far</strong>.
+    </div>
+
+    <div class="code-block" style="margin-top:20px;">
+      <div class="code-header">
+        <div class="code-dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div>
+        <div class="code-filename">skill_tracker.py</div>
+      </div>
+      <div class="code-body">
+<span class="py-comment"># AI Skill Tracker — Lists & Collections Project</span><br><br>
+<span class="py-var">to_learn</span> = [<span class="py-string">"Python basics"</span>, <span class="py-string">"APIs"</span>, <span class="py-string">"Prompt engineering"</span>, <span class="py-string">"Automation"</span>]<br>
+<span class="py-var">learned</span> = [<span class="py-string">"Variables"</span>, <span class="py-string">"Functions"</span>, <span class="py-string">"Conditionals"</span>, <span class="py-string">"Loops"</span>]<br><br>
+<span class="py-keyword">def</span> <span class="py-def">show_progress</span>():<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-string">"\n=== YOUR AI ENGINEERING PROGRESS ==="</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-fstring">f"\n✅ LEARNED ({<span class="py-func">len</span>(<span class="py-var">learned</span>)} skills):"</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">for</span> <span class="py-var">i</span>, <span class="py-var">skill</span> <span class="py-keyword">in</span> <span class="py-func">enumerate</span>(<span class="py-var">learned</span>):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-fstring">f"  {<span class="py-var">i</span>+<span class="py-number">1</span>}. {<span class="py-var">skill</span>}"</span>)<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-fstring">f"\n📚 STILL TO LEARN ({<span class="py-func">len</span>(<span class="py-var">to_learn</span>)} skills):"</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">for</span> <span class="py-var">i</span>, <span class="py-var">skill</span> <span class="py-keyword">in</span> <span class="py-func">enumerate</span>(<span class="py-var">to_learn</span>):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-fstring">f"  {<span class="py-var">i</span>+<span class="py-number">1</span>}. {<span class="py-var">skill</span>}"</span>)<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">total</span> = <span class="py-func">len</span>(<span class="py-var">learned</span>) + <span class="py-func">len</span>(<span class="py-var">to_learn</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">percent</span> = <span class="py-func">round</span>((<span class="py-func">len</span>(<span class="py-var">learned</span>) / <span class="py-var">total</span>) * <span class="py-number">100</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-fstring">f"\n🎯 Progress: {<span class="py-var">percent</span>}% complete"</span>)<br><br>
+<span class="py-keyword">def</span> <span class="py-def">mark_learned</span>(<span class="py-param">skill_name</span>):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">if</span> <span class="py-param">skill_name</span> <span class="py-keyword">in</span> <span class="py-var">to_learn</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">to_learn</span>.<span class="py-method">remove</span>(<span class="py-param">skill_name</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">learned</span>.<span class="py-method">append</span>(<span class="py-param">skill_name</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-fstring">f"✅ '{<span class="py-param">skill_name</span>}' marked as learned!"</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">else</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-fstring">f"'{<span class="py-param">skill_name</span>}' not found in your to-learn list."</span>)<br><br>
+<span class="py-keyword">def</span> <span class="py-def">add_skill</span>(<span class="py-param">skill_name</span>):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">if</span> <span class="py-param">skill_name</span> <span class="py-keyword">not in</span> <span class="py-var">to_learn</span> <span class="py-keyword">and</span> <span class="py-param">skill_name</span> <span class="py-keyword">not in</span> <span class="py-var">learned</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">to_learn</span>.<span class="py-method">append</span>(<span class="py-param">skill_name</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-fstring">f"📚 '{<span class="py-param">skill_name</span>}' added to your list!"</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">else</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-string">"That skill is already on your list."</span>)<br><br>
+<span class="py-comment"># --- Main Menu Loop ---</span><br>
+<span class="py-keyword">while</span> <span class="py-keyword">True</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-string">"\n1. View progress  2. Mark learned  3. Add skill  4. Quit"</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">choice</span> = <span class="py-func">input</span>(<span class="py-string">"Choose: "</span>)<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">if</span> <span class="py-var">choice</span> == <span class="py-string">"1"</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-def">show_progress</span>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">elif</span> <span class="py-var">choice</span> == <span class="py-string">"2"</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">skill</span> = <span class="py-func">input</span>(<span class="py-string">"Which skill did you learn? "</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-def">mark_learned</span>(<span class="py-var">skill</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">elif</span> <span class="py-var">choice</span> == <span class="py-string">"3"</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">skill</span> = <span class="py-func">input</span>(<span class="py-string">"What skill do you want to add? "</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-def">add_skill</span>(<span class="py-var">skill</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">elif</span> <span class="py-var">choice</span> == <span class="py-string">"4"</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-string">"Keep building! 🚀"</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">break</span>
+      </div>
+    </div>
+
+    <div class="output-block">
+      <div class="output-label">Example Session</div>
+      1. View progress &nbsp; 2. Mark learned &nbsp; 3. Add skill &nbsp; 4. Quit<br>
+      Choose: <span style="color:var(--accent2)">1</span><br><br>
+      === YOUR AI ENGINEERING PROGRESS ===<br>
+      ✅ LEARNED (4 skills):<br>
+      &nbsp;&nbsp;1. Variables<br>
+      &nbsp;&nbsp;2. Functions<br>
+      &nbsp;&nbsp;3. Conditionals<br>
+      &nbsp;&nbsp;4. Loops<br>
+      📚 STILL TO LEARN (4 skills):<br>
+      &nbsp;&nbsp;1. Python basics<br>
+      &nbsp;&nbsp;2. APIs<br>
+      🎯 Progress: 50% complete
+    </div>
+
+    <div class="callout" style="background:rgba(232,121,249,0.04);border-color:rgba(232,121,249,0.18);color:#907090;margin-top:20px;">
+      <div class="callout-label" style="color:var(--accent);">🔥 STRETCH CHALLENGE</div>
+      Add a <strong>5th menu option</strong> — <em>"Show next skill to learn"</em> — that prints <code>to_learn[0]</code> with an encouraging message. Then update the <code>to_learn</code> list with real skills from your actual roadmap to AI engineering. Make this tracker genuinely yours.
+    </div>
+
+    <ul class="checklist">
+      <li><div class="check-box"></div>Two lists defined — <code>to_learn</code> and <code>learned</code></li>
+      <li><div class="check-box"></div><code>show_progress()</code> uses <code>enumerate()</code> and <code>len()</code> correctly</li>
+      <li><div class="check-box"></div><code>mark_learned()</code> uses <code>in</code> to check before moving items between lists</li>
+      <li><div class="check-box"></div><code>add_skill()</code> prevents duplicates using <code>not in</code></li>
+      <li><div class="check-box"></div>Main menu uses a <code>while True</code> loop with <code>break</code></li>
+      <li><div class="check-box"></div>f-strings used throughout — no string concatenation with <code>+</code></li>
+      <li><div class="check-box"></div>Stretch: 5th menu option added and list personalised to your real roadmap</li>
+    </ul>
+  </div>
+
+  <!-- HOMEWORK -->
+  <div class="homework-card">
+    <div class="homework-title">🚀 Build in Public</div>
+    <div style="font-size:14px;color:#7060a0;margin-bottom:20px;line-height:1.7;">
+      Three steps. Keep the streak alive — your audience is watching.
+    </div>
+
+    <ul class="checklist">
+      <li><div class="check-box"></div><div><strong style="color:var(--text);">GitHub:</strong> Push <code>skill_tracker.py</code> to your <code>Python-Learning-Journey</code> repo. Commit message: <em>"Lists project: AI skill tracker with menus and progress report"</em></div></li>
+      <li><div class="check-box"></div><div><strong style="color:var(--text);">Screenshot:</strong> Run the tracker, view your progress, mark a skill as learned, then view progress again. Screenshot the whole session — the before and after makes a great post.</div></li>
+      <li><div class="check-box"></div><div><strong style="color:var(--text);">Post on X:</strong> Use the caption below or write your own.</div></li>
+    </ul>
+
+    <div class="tweet-preview">
+      Built a personal AI skill tracker today using Python lists — it stores what I've learned, what's next, and calculates my progress percentage. Starting to build things that are actually useful to me. The fundamentals are stacking up fast. 📊 <span class="hashtag">#100DaysOfCode</span> <span class="hashtag">#Python</span> <span class="hashtag">#BuildInPublic</span> <span class="hashtag">#AIEngineering</span>
+    </div>
+  </div>
+
+</main>
+</body>
+</html>
