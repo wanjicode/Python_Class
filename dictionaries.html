@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dictionaries — Python</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1410;
+    --surface: #131a16;
+    --surface2: #1a2420;
+    --border: #253530;
+    --accent: #2dd4bf;
+    --accent2: #f472b6;
+    --accent3: #fbbf24;
+    --text: #e8f8f5;
+    --muted: #507060;
+    --code-bg: #080e0c;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  header {
+    padding: 60px 40px 40px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  header::before {
+    content: '';
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 440px; height: 440px;
+    background: radial-gradient(circle, rgba(45,212,191,0.09) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  header::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; left: 200px;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(244,114,182,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .topic-badge {
+    display: inline-flex;
+    align-items: center;
+    background: var(--accent);
+    color: #000;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 2px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  header h1 {
+    font-size: clamp(36px, 6vw, 64px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -2px;
+  }
+
+  header h1 span { color: var(--accent); }
+
+  .header-sub {
+    font-size: 16px;
+    color: var(--muted);
+    margin-top: 14px;
+    max-width: 560px;
+    line-height: 1.6;
+  }
+
+  .header-meta {
+    display: flex;
+    gap: 16px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+
+  .meta-pill {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    padding: 4px 12px;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+  }
+
+  main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 40px 80px;
+  }
+
+  /* GOAL CARD */
+  .goal-card {
+    background: rgba(45,212,191,0.05);
+    border: 1px solid rgba(45,212,191,0.2);
+    border-radius: 4px;
+    padding: 24px;
+    margin-top: 40px;
+    margin-bottom: 40px;
+  }
+
+  .goal-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+
+  .goal-text {
+    font-size: 15px;
+    color: #90c8c0;
+    line-height: 1.7;
+  }
+
+  .goal-text strong { color: var(--text); }
+
+  /* SECTION HEADERS */
+  .section-label {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+    margin-top: 48px;
+  }
+
+  .section-number {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .section-divider { flex: 1; height: 1px; background: var(--border); }
+  .section-title { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+
+  /* CONCEPT CARDS */
+  .concept-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 28px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .concept-card:hover { border-color: var(--accent); }
+  .concept-card::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: var(--accent); }
+  .concept-card.pink::before { background: var(--accent2); }
+  .concept-card.yellow::before { background: var(--accent3); }
+
+  .concept-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .concept-title { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; }
+
+  .time-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    background: var(--surface2);
+    padding: 3px 10px;
+    border-radius: 2px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .student-voice {
+    font-size: 15px;
+    color: #80b0a8;
+    line-height: 1.75;
+    margin-bottom: 20px;
+  }
+
+  .student-voice strong { color: var(--accent); font-weight: 600; }
+  .student-voice em { color: var(--accent2); font-style: normal; font-weight: 600; }
+
+  /* ANALOGY */
+  .analogy-box {
+    background: rgba(45,212,191,0.04);
+    border: 1px solid rgba(45,212,191,0.14);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 4px 4px 0;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    color: #70a098;
+    line-height: 1.7;
+  }
+
+  .analogy-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+
+  /* COMPARE VISUAL */
+  .compare-visual {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 16px 0;
+  }
+
+  @media(max-width:600px) { .compare-visual { grid-template-columns: 1fr; } }
+
+  .compare-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 16px;
+  }
+
+  .compare-box-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .compare-box.list-box .compare-box-label { color: #f472b6; }
+  .compare-box.dict-box .compare-box-label { color: var(--accent); }
+
+  .compare-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 6px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+  }
+
+  .compare-key {
+    padding: 4px 10px;
+    border-radius: 2px;
+    font-size: 11px;
+    flex-shrink: 0;
+  }
+
+  .list-key { background: rgba(244,114,182,0.1); color: #f472b6; border: 1px solid rgba(244,114,182,0.2); }
+  .dict-key { background: rgba(45,212,191,0.1); color: var(--accent); border: 1px solid rgba(45,212,191,0.2); }
+  .compare-arrow { color: var(--muted); }
+  .compare-val { color: var(--text); font-size: 12px; }
+
+  /* CODE BLOCKS */
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 16px;
+  }
+
+  .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+  }
+
+  .code-dots { display: flex; gap: 6px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot.red { background: #ff5f57; }
+  .dot.yellow { background: #ffbd2e; }
+  .dot.green { background: #28c840; }
+
+  .code-filename { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted); }
+
+  .code-body {
+    padding: 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    line-height: 1.9;
+    overflow-x: auto;
+  }
+
+  .py-keyword { color: #c792ea; }
+  .py-func { color: #82aaff; }
+  .py-def { color: #2dd4bf; }
+  .py-string { color: #c3e88d; }
+  .py-var { color: #f8b500; }
+  .py-comment { color: #2a4038; font-style: italic; }
+  .py-number { color: #f78c6c; }
+  .py-fstring { color: #89ddff; }
+  .py-param { color: #ffcb6b; }
+  .py-op { color: #fb923c; }
+  .py-key { color: #f472b6; }
+  .py-method { color: #2dd4bf; }
+
+  .output-block {
+    background: #050a08;
+    border: 1px solid var(--border);
+    border-top: none;
+    padding: 16px 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    color: var(--accent);
+    line-height: 1.8;
+  }
+
+  .output-label { font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; }
+
+  /* METHODS TABLE */
+  .methods-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+  }
+
+  .methods-table th {
+    text-align: left;
+    padding: 10px 16px;
+    background: var(--surface2);
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-size: 10px;
+    border: 1px solid var(--border);
+  }
+
+  .methods-table td {
+    padding: 11px 16px;
+    border: 1px solid var(--border);
+    vertical-align: top;
+    line-height: 1.6;
+    color: #80a898;
+    font-size: 12px;
+  }
+
+  .methods-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .method-name { color: var(--accent); font-weight: 700; }
+
+  /* CALLOUT */
+  .callout {
+    background: rgba(251,191,36,0.05);
+    border: 1px solid rgba(251,191,36,0.2);
+    border-radius: 4px;
+    padding: 16px 20px;
+    margin: 16px 0;
+    font-size: 14px;
+    color: #907850;
+    line-height: 1.7;
+  }
+
+  .callout-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--accent3);
+    margin-bottom: 6px;
+  }
+
+  .callout.danger {
+    background: rgba(251,113,133,0.05);
+    border-color: rgba(251,113,133,0.2);
+    color: #907070;
+  }
+
+  .callout.danger .callout-label { color: #fb7185; }
+
+  .callout.teal {
+    background: rgba(45,212,191,0.04);
+    border-color: rgba(45,212,191,0.18);
+    color: #609890;
+  }
+
+  .callout.teal .callout-label { color: var(--accent); }
+
+  /* TRY IT */
+  .try-it {
+    background: rgba(45,212,191,0.04);
+    border: 1px solid rgba(45,212,191,0.16);
+    border-radius: 4px;
+    padding: 18px 20px;
+    margin-top: 18px;
+  }
+
+  .try-it-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .try-it-label::before { content: '▶'; font-size: 10px; }
+  .try-it-text { font-size: 14px; color: #60988c; line-height: 1.7; }
+
+  /* PROJECT CARD */
+  .project-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 32px;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+
+  .project-banner {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+  }
+
+  .project-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    background: rgba(45,212,191,0.08);
+    padding: 4px 10px;
+    border: 1px solid rgba(45,212,191,0.22);
+    border-radius: 2px;
+    display: inline-block;
+    margin-bottom: 16px;
+  }
+
+  .project-title { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 6px; }
+  .project-subtitle { font-size: 14px; color: var(--muted); margin-bottom: 20px; }
+
+  /* CHECKLIST */
+  .checklist { list-style: none; margin-top: 20px; }
+
+  .checklist li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    color: #709888;
+    line-height: 1.5;
+  }
+
+  .checklist li:last-child { border-bottom: none; }
+
+  .check-box {
+    width: 18px; height: 18px;
+    border: 1.5px solid var(--border);
+    border-radius: 2px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  /* HOMEWORK */
+  .homework-card {
+    background: linear-gradient(135deg, rgba(45,212,191,0.05), rgba(244,114,182,0.03));
+    border: 1px solid rgba(45,212,191,0.2);
+    border-radius: 4px;
+    padding: 28px;
+    margin-top: 20px;
+  }
+
+  .homework-title { font-size: 20px; font-weight: 800; color: var(--accent); margin-bottom: 8px; letter-spacing: -0.5px; }
+
+  .tweet-preview {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 20px;
+    margin-top: 16px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text);
+  }
+
+  .tweet-preview .hashtag { color: #4aa0f0; font-weight: 600; }
+
+  code {
+    background: var(--surface2);
+    padding: 2px 8px;
+    border-radius: 2px;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+  }
+
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="topic-badge">Python Fundamentals</div>
+  <h1>Dictionaries —<br><span>Key & Value</span></h1>
+  <div class="header-sub">The most important data structure in Python — and the backbone of every API, AI response, and real-world dataset you'll ever work with.</div>
+  <div class="header-meta">
+    <div class="meta-pill">2 HOURS</div>
+    <div class="meta-pill">DICTS · KEYS · VALUES · NESTING</div>
+    <div class="meta-pill">#BUILDINPUBLIC</div>
+  </div>
+</header>
+
+<main>
+
+  <div class="goal-card">
+    <div class="goal-label">🎯 What You'll Be Able to Do After This</div>
+    <div class="goal-text">
+      You'll know how to store data as <strong>labelled pairs</strong> instead of positional indexes, how to read, update, and loop through dictionaries, and how to work with nested dictionaries. More importantly — when you start calling AI APIs in a few sessions, <strong>every single response will come back as a dictionary</strong>. Today is prep for that moment.
+    </div>
+  </div>
+
+  <!-- PART 1 -->
+  <div class="section-label">
+    <div class="section-number">Part 01</div>
+    <div class="section-divider"></div>
+  </div>
+  <div class="section-title">What is a Dictionary?</div>
+
+  <!-- CONCEPT 1 -->
+  <div class="concept-card" style="margin-top:24px;">
+    <div class="concept-header">
+      <div class="concept-title">Lists vs Dictionaries — Knowing Which to Use</div>
+      <div class="time-tag">15 mins</div>
+    </div>
+
+    <div class="analogy-box">
+      <div class="analogy-label">💡 Think of it this way</div>
+      A <strong>list</strong> is like a numbered queue — item 0, item 1, item 2. You find things by their position. A <strong>dictionary</strong> is like a real dictionary — you look things up by their <em>name</em> (the key), and get back the <em>definition</em> (the value). Instead of <code>person[0]</code> to get a name, you write <code>person["name"]</code>. Much more readable, and far more powerful.
+    </div>
+
+    <div class="compare-visual">
+      <div class="compare-box list-box">
+        <div class="compare-box-label">List — positional</div>
+        <div class="compare-row"><div class="compare-key list-key">0</div><div class="compare-arrow">→</div><div class="compare-val">"Marcus"</div></div>
+        <div class="compare-row"><div class="compare-key list-key">1</div><div class="compare-arrow">→</div><div class="compare-val">18</div></div>
+        <div class="compare-row"><div class="compare-key list-key">2</div><div class="compare-arrow">→</div><div class="compare-val">"Nairobi"</div></div>
+        <div class="compare-row"><div class="compare-key list-key">3</div><div class="compare-arrow">→</div><div class="compare-val">"AI Engineer"</div></div>
+      </div>
+      <div class="compare-box dict-box">
+        <div class="compare-box-label">Dictionary — labelled</div>
+        <div class="compare-row"><div class="compare-key dict-key">"name"</div><div class="compare-arrow">→</div><div class="compare-val">"Marcus"</div></div>
+        <div class="compare-row"><div class="compare-key dict-key">"age"</div><div class="compare-arrow">→</div><div class="compare-val">18</div></div>
+        <div class="compare-row"><div class="compare-key dict-key">"city"</div><div class="compare-arrow">→</div><div class="compare-val">"Nairobi"</div></div>
+        <div class="compare-row"><div class="compare-key dict-key">"goal"</div><div class="compare-arrow">→</div><div class="compare-val">"AI Engineer"</div></div>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div>
+        <div class="code-filename">dict_intro.py</div>
+      </div>
+      <div class="code-body">
+<span class="py-comment"># Create a dictionary with curly braces {}</span><br>
+<span class="py-var">student</span> = {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-key">"name"</span>: <span class="py-string">"Marcus"</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-key">"age"</span>: <span class="py-number">18</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-key">"city"</span>: <span class="py-string">"Nairobi"</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-key">"goal"</span>: <span class="py-string">"AI Engineer"</span><br>
+}<br><br>
+<span class="py-comment"># Access values by their KEY — not by position</span><br>
+<span class="py-func">print</span>(<span class="py-var">student</span>[<span class="py-key">"name"</span>])   <span class="py-comment"># → Marcus</span><br>
+<span class="py-func">print</span>(<span class="py-var">student</span>[<span class="py-key">"goal"</span>])   <span class="py-comment"># → AI Engineer</span><br><br>
+<span class="py-comment"># Use f-strings to build readable output</span><br>
+<span class="py-func">print</span>(<span class="py-fstring">f"Name: {<span class="py-var">student</span>[<span class="py-key">'name'</span>]}, Age: {<span class="py-var">student</span>[<span class="py-key">'age'</span>]}, Goal: {<span class="py-var">student</span>[<span class="py-key">'goal'</span>]}"</span>)<br><br>
+<span class="py-comment"># Check how many key-value pairs</span><br>
+<span class="py-func">print</span>(<span class="py-func">len</span>(<span class="py-var">student</span>))  <span class="py-comment"># → 4</span>
+      </div>
+    </div>
+    <div class="output-block">
+      <div class="output-label">Output</div>
+      Marcus<br>AI Engineer<br>Name: Marcus, Age: 18, Goal: AI Engineer<br>4
+    </div>
+
+    <div class="callout danger">
+      <div class="callout-label">⚠️ KeyError — The Dictionary Version of IndexError</div>
+      If you try to access a key that doesn't exist — like <code>student["phone"]</code> when there's no "phone" key — Python throws a <strong>KeyError</strong>. Later you'll learn to use <code>.get()</code> to handle this safely. For now, always make sure the key exists before accessing it.
+    </div>
+
+    <div class="try-it">
+      <div class="try-it-label">Try It</div>
+      <div class="try-it-text">Create a dictionary called <code>my_profile</code> with at least 5 keys: your name, age, city, favourite programming concept so far, and your AI engineering goal. Then print a formatted introduction using f-strings that reads like a proper bio.</div>
+    </div>
+  </div>
+
+  <!-- CONCEPT 2 -->
+  <div class="concept-card pink">
+    <div class="concept-header">
+      <div class="concept-title">Adding, Updating & Removing — Changing a Dictionary</div>
+      <div class="time-tag">20 mins</div>
+    </div>
+
+    <div class="student-voice">
+      Dictionaries are <strong>mutable</strong> — that means you can change them after they're created. You can add new keys, update existing values, and remove keys you no longer need. This is important because in real programs, data is always changing — a user updates their profile, an AI response adds new fields, a config file gets a new setting.
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div>
+        <div class="code-filename">dict_update.py</div>
+      </div>
+      <div class="code-body">
+<span class="py-var">profile</span> = {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-key">"name"</span>: <span class="py-string">"Marcus"</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-key">"skills"</span>: <span class="py-number">4</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-key">"active"</span>: <span class="py-keyword">True</span><br>
+}<br><br>
+<span class="py-comment"># Add a NEW key</span><br>
+<span class="py-var">profile</span>[<span class="py-key">"city"</span>] = <span class="py-string">"Nairobi"</span><br>
+<span class="py-func">print</span>(<span class="py-var">profile</span>)<br><br>
+<span class="py-comment"># Update an EXISTING key</span><br>
+<span class="py-var">profile</span>[<span class="py-key">"skills"</span>] = <span class="py-number">5</span>  <span class="py-comment"># just learned Lists!</span><br>
+<span class="py-func">print</span>(<span class="py-var">profile</span>[<span class="py-key">"skills"</span>])<br><br>
+<span class="py-comment"># Remove a key safely with .pop()</span><br>
+<span class="py-var">removed</span> = <span class="py-var">profile</span>.<span class="py-method">pop</span>(<span class="py-key">"active"</span>)<br>
+<span class="py-func">print</span>(<span class="py-fstring">f"Removed: {<span class="py-var">removed</span>}"</span>)<br>
+<span class="py-func">print</span>(<span class="py-var">profile</span>)<br><br>
+<span class="py-comment"># Check if a key exists before accessing it</span><br>
+<span class="py-keyword">if</span> <span class="py-string">"city"</span> <span class="py-keyword">in</span> <span class="py-var">profile</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-fstring">f"City found: {<span class="py-var">profile</span>[<span class="py-key">'city'</span>]}"</span>)<br><br>
+<span class="py-comment"># .get() — safe access with a default fallback</span><br>
+<span class="py-func">print</span>(<span class="py-var">profile</span>.<span class="py-method">get</span>(<span class="py-key">"phone"</span>, <span class="py-string">"No phone listed"</span>))
+      </div>
+    </div>
+    <div class="output-block">
+      <div class="output-label">Output</div>
+      {'name': 'Marcus', 'skills': 4, 'active': True, 'city': 'Nairobi'}<br>
+      5<br>
+      Removed: True<br>
+      {'name': 'Marcus', 'skills': 5, 'city': 'Nairobi'}<br>
+      City found: Nairobi<br>
+      No phone listed
+    </div>
+
+    <div class="callout teal">
+      <div class="callout-label">💡 Always Use .get() When You're Not Sure a Key Exists</div>
+      <code>.get("key", default)</code> returns the value if the key exists, or the default if it doesn't — <strong>without crashing your program</strong>. When you start working with AI API responses, some keys will be optional and won't always be there. <code>.get()</code> will save you constantly.
+    </div>
+
+    <div class="try-it">
+      <div class="try-it-label">Try It</div>
+      <div class="try-it-text">Start with your <code>my_profile</code> dictionary. Add a new key <code>"projects_built"</code> with a count of how many projects you've built so far. Update your <code>"goal"</code> to something more specific. Then use <code>.get()</code> to safely try to access a key that doesn't exist, with a sensible default message.</div>
+    </div>
+  </div>
+
+  <!-- CONCEPT 3 -->
+  <div class="concept-card yellow">
+    <div class="concept-header">
+      <div class="concept-title">Looping & Methods — Working Through a Dictionary</div>
+      <div class="time-tag">25 mins</div>
+    </div>
+
+    <div class="student-voice">
+      Just like lists, you'll often need to <strong>loop through a dictionary</strong> — through its keys, its values, or both at the same time. Python gives you three methods for this: <code>.keys()</code>, <code>.values()</code>, and <code>.items()</code>. The last one is the most useful — it gives you both the key and value together on every iteration.
+    </div>
+
+    <table class="methods-table">
+      <thead>
+        <tr><th>Method</th><th>What it gives you</th><th>When to use it</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="method-name">.keys()</span></td><td>All the keys</td><td>When you only need to know what fields exist</td></tr>
+        <tr><td><span class="method-name">.values()</span></td><td>All the values</td><td>When you only need the data, not the labels</td></tr>
+        <tr><td><span class="method-name">.items()</span></td><td>Key-value pairs as tuples</td><td>Most of the time — gives you everything</td></tr>
+        <tr><td><span class="method-name">.get(k, default)</span></td><td>Value or safe fallback</td><td>When a key might not exist</td></tr>
+        <tr><td><span class="method-name">.update(dict2)</span></td><td>Merges another dict in</td><td>When combining two data sources</td></tr>
+        <tr><td><code>in</code></td><td>True if key exists</td><td>Before accessing an uncertain key</td></tr>
+      </tbody>
+    </table>
+
+    <div class="code-block" style="margin-top:20px;">
+      <div class="code-header">
+        <div class="code-dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div>
+        <div class="code-filename">dict_loops.py</div>
+      </div>
+      <div class="code-body">
+<span class="py-var">ai_tools</span> = {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-key">"ChatGPT"</span>: <span class="py-string">"OpenAI"</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-key">"Claude"</span>: <span class="py-string">"Anthropic"</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-key">"Gemini"</span>: <span class="py-string">"Google"</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-key">"Copilot"</span>: <span class="py-string">"Microsoft"</span><br>
+}<br><br>
+<span class="py-comment"># Loop through keys only</span><br>
+<span class="py-func">print</span>(<span class="py-string">"AI Tools:"</span>)<br>
+<span class="py-keyword">for</span> <span class="py-var">tool</span> <span class="py-keyword">in</span> <span class="py-var">ai_tools</span>.<span class="py-method">keys</span>():<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-fstring">f"  - {<span class="py-var">tool</span>}"</span>)<br><br>
+<span class="py-comment"># Loop through key-value pairs — the most useful</span><br>
+<span class="py-func">print</span>(<span class="py-string">"\nTool → Company:"</span>)<br>
+<span class="py-keyword">for</span> <span class="py-var">tool</span>, <span class="py-var">company</span> <span class="py-keyword">in</span> <span class="py-var">ai_tools</span>.<span class="py-method">items</span>():<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-fstring">f"  {<span class="py-var">tool</span>} is made by {<span class="py-var">company</span>}"</span>)<br><br>
+<span class="py-comment"># Combine with a conditional</span><br>
+<span class="py-keyword">for</span> <span class="py-var">tool</span>, <span class="py-var">company</span> <span class="py-keyword">in</span> <span class="py-var">ai_tools</span>.<span class="py-method">items</span>():<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">if</span> <span class="py-var">company</span> == <span class="py-string">"Anthropic"</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-fstring">f"\n{<span class="py-var">tool</span>} is the one we'll use to build AI apps!"</span>)
+      </div>
+    </div>
+    <div class="output-block">
+      <div class="output-label">Output</div>
+      AI Tools:<br>
+      &nbsp;&nbsp;- ChatGPT<br>
+      &nbsp;&nbsp;- Claude<br>
+      &nbsp;&nbsp;- Gemini<br>
+      &nbsp;&nbsp;- Copilot<br><br>
+      Tool → Company:<br>
+      &nbsp;&nbsp;ChatGPT is made by OpenAI<br>
+      &nbsp;&nbsp;Claude is made by Anthropic<br>
+      &nbsp;&nbsp;Gemini is made by Google<br>
+      &nbsp;&nbsp;Copilot is made by Microsoft<br><br>
+      Claude is the one we'll use to build AI apps!
+    </div>
+
+    <div class="try-it">
+      <div class="try-it-label">Try It</div>
+      <div class="try-it-text">Create a dictionary called <code>weekly_progress</code> where each key is a day ("Monday", "Tuesday", etc.) and each value is what you coded that day. Loop through it using <code>.items()</code> and print each day's entry. Then add a conditional that prints a special message for any day where the value contains the word "project".</div>
+    </div>
+  </div>
+
+  <!-- PART 2 -->
+  <div class="section-label">
+    <div class="section-number">Part 02</div>
+    <div class="section-divider"></div>
+  </div>
+  <div class="section-title">Nested Dictionaries — Dicts Inside Dicts</div>
+
+  <div class="concept-card" style="margin-top:24px;">
+    <div class="concept-header">
+      <div class="concept-title">Real-World Data is Always Nested</div>
+      <div class="time-tag">20 mins</div>
+    </div>
+
+    <div class="student-voice">
+      In the real world, data is rarely flat. A user doesn't just have a name — they have a name, an address with a street and city, a list of skills, and a settings object. This is called <strong>nested data</strong> — dictionaries inside dictionaries. It's also <em>exactly how AI API responses are structured</em>. Learning to read nested data now will make working with APIs feel natural when we get there.
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div>
+        <div class="code-filename">nested_dicts.py</div>
+      </div>
+      <div class="code-body">
+<span class="py-comment"># A nested dictionary — dict inside a dict</span><br>
+<span class="py-var">user</span> = {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-key">"name"</span>: <span class="py-string">"Marcus"</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-key">"location"</span>: {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-key">"city"</span>: <span class="py-string">"Nairobi"</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-key">"country"</span>: <span class="py-string">"Kenya"</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;},<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-key">"skills"</span>: [<span class="py-string">"Python"</span>, <span class="py-string">"Git"</span>, <span class="py-string">"Functions"</span>, <span class="py-string">"Loops"</span>, <span class="py-string">"Lists"</span>],<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-key">"stats"</span>: {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-key">"days_coded"</span>: <span class="py-number">11</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-key">"projects_built"</span>: <span class="py-number">6</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+}<br><br>
+<span class="py-comment"># Access nested values by chaining keys</span><br>
+<span class="py-func">print</span>(<span class="py-var">user</span>[<span class="py-key">"name"</span>])<br>
+<span class="py-func">print</span>(<span class="py-var">user</span>[<span class="py-key">"location"</span>][<span class="py-key">"city"</span>])<br>
+<span class="py-func">print</span>(<span class="py-var">user</span>[<span class="py-key">"stats"</span>][<span class="py-key">"days_coded"</span>])<br>
+<span class="py-func">print</span>(<span class="py-var">user</span>[<span class="py-key">"skills"</span>][<span class="py-number">0</span>])  <span class="py-comment"># first skill in the list</span><br><br>
+<span class="py-comment"># Loop through the skills list inside the dict</span><br>
+<span class="py-func">print</span>(<span class="py-string">"\nSkills learned so far:"</span>)<br>
+<span class="py-keyword">for</span> <span class="py-var">skill</span> <span class="py-keyword">in</span> <span class="py-var">user</span>[<span class="py-key">"skills"</span>]:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-fstring">f"  ✅ {<span class="py-var">skill</span>}"</span>)<br><br>
+<span class="py-comment"># Build a summary with f-strings</span><br>
+<span class="py-func">print</span>(<span class="py-fstring">f"\n{<span class="py-var">user</span>[<span class="py-key">'name'</span>]} from {<span class="py-var">user</span>[<span class="py-key">'location'</span>][<span class="py-key">'city'</span>]} has coded for {<span class="py-var">user</span>[<span class="py-key">'stats'</span>][<span class="py-key">'days_coded'</span>]} days!"</span>)
+      </div>
+    </div>
+    <div class="output-block">
+      <div class="output-label">Output</div>
+      Marcus<br>Nairobi<br>11<br>Python<br><br>
+      Skills learned so far:<br>
+      &nbsp;&nbsp;✅ Python<br>
+      &nbsp;&nbsp;✅ Git<br>
+      &nbsp;&nbsp;✅ Functions<br>
+      &nbsp;&nbsp;✅ Loops<br>
+      &nbsp;&nbsp;✅ Lists<br><br>
+      Marcus from Nairobi has coded for 11 days!
+    </div>
+
+    <div class="callout teal">
+      <div class="callout-label">🔗 THIS IS WHAT AI API RESPONSES LOOK LIKE</div>
+      When you call the Claude or ChatGPT API, the response comes back as a nested dictionary exactly like this — with keys like <code>"content"</code>, <code>"model"</code>, <code>"usage"</code>, and nested data inside each one. Understanding nested dicts today means that when we get to APIs, you'll already know how to read the data. You're not just learning syntax — you're learning to read AI.
+    </div>
+
+    <div class="try-it">
+      <div class="try-it-label">Try It</div>
+      <div class="try-it-text">Build a nested dictionary called <code>my_journey</code> with at least three nested sections: <code>"progress"</code> (days coded, projects built), <code>"next_goals"</code> (a dict with short-term and long-term goals as strings), and <code>"tools"</code> (a list of tools you use). Print a full summary by accessing the nested values using chained keys.</div>
+    </div>
+  </div>
+
+  <!-- PART 3 — PROJECT -->
+  <div class="section-label">
+    <div class="section-number">Part 03</div>
+    <div class="section-divider"></div>
+  </div>
+  <div class="section-title">Today's Project</div>
+
+  <div class="project-card" style="margin-top:24px;">
+    <div class="project-banner"></div>
+    <div class="project-label">BUILD</div>
+    <div class="project-title">The AI Chatbot Contact Book</div>
+    <div class="project-subtitle">A dictionary-powered app that manages AI tools and their details — 40 mins</div>
+
+    <div class="student-voice" style="margin-bottom:0;">
+      You're building a contact book — but instead of people, you're storing AI tools. Each tool has nested details: the company that made it, what it's used for, whether you've tried it, and a rating. You'll be able to view all tools, look up a specific one, add new ones, and update your ratings. This is a real data management app built entirely with dictionaries, loops, and functions.
+    </div>
+
+    <div class="code-block" style="margin-top:20px;">
+      <div class="code-header">
+        <div class="code-dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div>
+        <div class="code-filename">ai_contact_book.py</div>
+      </div>
+      <div class="code-body">
+<span class="py-comment"># AI Tool Contact Book — Dictionaries Project</span><br><br>
+<span class="py-var">ai_tools</span> = {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-key">"Claude"</span>: {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-key">"company"</span>: <span class="py-string">"Anthropic"</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-key">"use_case"</span>: <span class="py-string">"Coding, writing, reasoning"</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-key">"tried"</span>: <span class="py-keyword">True</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-key">"rating"</span>: <span class="py-number">5</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;},<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-key">"ChatGPT"</span>: {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-key">"company"</span>: <span class="py-string">"OpenAI"</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-key">"use_case"</span>: <span class="py-string">"General purpose AI assistant"</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-key">"tried"</span>: <span class="py-keyword">True</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-key">"rating"</span>: <span class="py-number">4</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;},<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-key">"Gemini"</span>: {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-key">"company"</span>: <span class="py-string">"Google"</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-key">"use_case"</span>: <span class="py-string">"Search, multimodal tasks"</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-key">"tried"</span>: <span class="py-keyword">False</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-key">"rating"</span>: <span class="py-keyword">None</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+}<br><br>
+<span class="py-keyword">def</span> <span class="py-def">show_all</span>():<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-string">"\n=== ALL AI TOOLS ==="</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">for</span> <span class="py-var">name</span>, <span class="py-var">details</span> <span class="py-keyword">in</span> <span class="py-var">ai_tools</span>.<span class="py-method">items</span>():<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">tried_str</span> = <span class="py-string">"✅ Tried"</span> <span class="py-keyword">if</span> <span class="py-var">details</span>[<span class="py-key">"tried"</span>] <span class="py-keyword">else</span> <span class="py-string">"⬜ Not yet"</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-fstring">f"\n  {<span class="py-var">name</span>} ({<span class="py-var">details</span>[<span class="py-key">'company'</span>]}) — {<span class="py-var">tried_str</span>}"</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-fstring">f"  Use: {<span class="py-var">details</span>[<span class="py-key">'use_case'</span>]}"</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">if</span> <span class="py-var">details</span>[<span class="py-key">"rating"</span>]:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-fstring">f"  Rating: {'⭐' * <span class="py-var">details</span>[<span class="py-key">'rating'</span>]}"</span>)<br><br>
+<span class="py-keyword">def</span> <span class="py-def">lookup_tool</span>(<span class="py-param">name</span>):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">tool</span> = <span class="py-var">ai_tools</span>.<span class="py-method">get</span>(<span class="py-param">name</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">if</span> <span class="py-var">tool</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-fstring">f"\n{<span class="py-param">name</span>}: {<span class="py-var">tool</span>}"</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">else</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-fstring">f"'{<span class="py-param">name</span>}' not found. Try adding it!"</span>)<br><br>
+<span class="py-keyword">def</span> <span class="py-def">add_tool</span>():<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">name</span>     = <span class="py-func">input</span>(<span class="py-string">"Tool name: "</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">company</span>  = <span class="py-func">input</span>(<span class="py-string">"Company: "</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">use_case</span> = <span class="py-func">input</span>(<span class="py-string">"Use case: "</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">ai_tools</span>[<span class="py-var">name</span>] = {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-key">"company"</span>: <span class="py-var">company</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-key">"use_case"</span>: <span class="py-var">use_case</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-key">"tried"</span>: <span class="py-keyword">False</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-key">"rating"</span>: <span class="py-keyword">None</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-fstring">f"✅ '{<span class="py-var">name</span>}' added!"</span>)<br><br>
+<span class="py-comment"># --- Main Menu ---</span><br>
+<span class="py-keyword">while</span> <span class="py-keyword">True</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-string">"\n1. View all  2. Look up  3. Add tool  4. Quit"</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">choice</span> = <span class="py-func">input</span>(<span class="py-string">"Choose: "</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">if</span> <span class="py-var">choice</span> == <span class="py-string">"1"</span>: <span class="py-def">show_all</span>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">elif</span> <span class="py-var">choice</span> == <span class="py-string">"2"</span>: <span class="py-def">lookup_tool</span>(<span class="py-func">input</span>(<span class="py-string">"Tool name: "</span>))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">elif</span> <span class="py-var">choice</span> == <span class="py-string">"3"</span>: <span class="py-def">add_tool</span>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">elif</span> <span class="py-var">choice</span> == <span class="py-string">"4"</span>: <span class="py-func">print</span>(<span class="py-string">"Keep building! 🚀"</span>); <span class="py-keyword">break</span>
+      </div>
+    </div>
+
+    <div class="output-block">
+      <div class="output-label">Example Session</div>
+      1. View all &nbsp; 2. Look up &nbsp; 3. Add tool &nbsp; 4. Quit<br>
+      Choose: <span style="color:var(--accent2)">1</span><br><br>
+      === ALL AI TOOLS ===<br><br>
+      &nbsp;&nbsp;Claude (Anthropic) — ✅ Tried<br>
+      &nbsp;&nbsp;Use: Coding, writing, reasoning<br>
+      &nbsp;&nbsp;Rating: ⭐⭐⭐⭐⭐<br><br>
+      &nbsp;&nbsp;ChatGPT (OpenAI) — ✅ Tried<br>
+      &nbsp;&nbsp;Use: General purpose AI assistant<br>
+      &nbsp;&nbsp;Rating: ⭐⭐⭐⭐<br><br>
+      &nbsp;&nbsp;Gemini (Google) — ⬜ Not yet<br>
+      &nbsp;&nbsp;Use: Search, multimodal tasks
+    </div>
+
+    <div class="callout" style="background:rgba(45,212,191,0.04);border-color:rgba(45,212,191,0.18);color:#508878;margin-top:20px;">
+      <div class="callout-label" style="color:var(--accent);">🔥 STRETCH CHALLENGE</div>
+      Add a <strong>"Rate a tool"</strong> option to the menu. It should ask for the tool name, check it exists using <code>.get()</code>, then ask for a rating from 1–5 and update the <code>"rating"</code> and <code>"tried"</code> fields. If the tool doesn't exist, print a helpful message instead of crashing.
+    </div>
+
+    <ul class="checklist">
+      <li><div class="check-box"></div>Main dictionary uses nested dicts with at least 4 keys per tool</li>
+      <li><div class="check-box"></div><code>show_all()</code> uses <code>.items()</code> to loop and a conditional for the tried/not tried display</li>
+      <li><div class="check-box"></div><code>lookup_tool()</code> uses <code>.get()</code> — no KeyError possible</li>
+      <li><div class="check-box"></div><code>add_tool()</code> builds a new nested dict from user input and inserts it</li>
+      <li><div class="check-box"></div>Star rating uses string multiplication — <code>'⭐' * rating</code></li>
+      <li><div class="check-box"></div>Main menu uses a <code>while True</code> loop with <code>break</code></li>
+      <li><div class="check-box"></div>Stretch: Rate a tool option added and working safely</li>
+    </ul>
+  </div>
+
+  <!-- HOMEWORK -->
+  <div class="homework-card">
+    <div class="homework-title">🚀 Build in Public</div>
+    <div style="font-size:14px;color:#407060;margin-bottom:20px;line-height:1.7;">
+      Push it. Post it. Keep the streak alive.
+    </div>
+
+    <ul class="checklist">
+      <li><div class="check-box"></div><div><strong style="color:var(--text);">GitHub:</strong> Push <code>ai_contact_book.py</code> to your repo. Commit message: <em>"Dictionaries project: AI tool contact book with nested data"</em></div></li>
+      <li><div class="check-box"></div><div><strong style="color:var(--text);">Screenshot:</strong> Run the app, view all tools, add a new one, then view all again to show it was added. Screenshot the full session — the before/after is satisfying to look at.</div></li>
+      <li><div class="check-box"></div><div><strong style="color:var(--text);">Post on X:</strong> Use the caption below or put it in your own words.</div></li>
+    </ul>
+
+    <div class="tweet-preview">
+      Today I learned Python dictionaries — how to store data as key-value pairs, nest them inside each other, and loop through them. Built an AI tool tracker that stores nested info about every AI tool I'm learning. Every AI API response is a dictionary. I'm basically already reading AI data. 🧩 <span class="hashtag">#100DaysOfCode</span> <span class="hashtag">#Python</span> <span class="hashtag">#BuildInPublic</span> <span class="hashtag">#AIEngineering</span>
+    </div>
+  </div>
+
+</main>
+</body>
+</html>
