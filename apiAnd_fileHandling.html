@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>APIs & File Handling — Python</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --surface: #131820;
+    --surface2: #1a212d;
+    --border: #25344a;
+    --accent: #06b6d4;
+    --accent2: #f43f5e;
+    --accent3: #10b981;
+    --text: #e8f0ff;
+    --muted: #4a6480;
+    --code-bg: #0a0d12;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  header {
+    padding: 60px 40px 40px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  header::before {
+    content: '';
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 440px; height: 440px;
+    background: radial-gradient(circle, rgba(6,182,212,0.09) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  header::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; left: 200px;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(244,63,94,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .topic-badge {
+    display: inline-flex;
+    align-items: center;
+    background: var(--accent);
+    color: #000;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 2px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  header h1 {
+    font-size: clamp(32px, 5.5vw, 60px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -2px;
+  }
+
+  header h1 span { color: var(--accent); }
+
+  .header-sub {
+    font-size: 16px;
+    color: var(--muted);
+    margin-top: 14px;
+    max-width: 600px;
+    line-height: 1.6;
+  }
+
+  .header-meta {
+    display: flex;
+    gap: 16px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+
+  .meta-pill {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    padding: 4px 12px;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+  }
+
+  main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 40px 80px;
+  }
+
+  .goal-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 28px;
+    margin: 20px 0;
+  }
+
+  .goal-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+
+  .goal-text {
+    font-size: 14px;
+    color: #b8c5d6;
+    line-height: 1.7;
+  }
+
+  .concept-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 28px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .concept-card:hover {
+    border-color: var(--accent);
+  }
+
+  .concept-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--accent);
+  }
+
+  .concept-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .concept-title {
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+  }
+
+  .time-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    background: var(--surface2);
+    padding: 3px 10px;
+    border-radius: 2px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .exercise-box {
+    background: rgba(6, 182, 212, 0.05);
+    border: 1px solid rgba(6, 182, 212, 0.2);
+    border-radius: 4px;
+    padding: 16px 20px;
+    margin-top: 16px;
+  }
+
+  .exercise-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .exercise-label::before {
+    content: '✦';
+    font-size: 12px;
+  }
+
+  .exercise-text {
+    font-size: 14px;
+    color: #b8c5d6;
+    line-height: 1.6;
+  }
+
+  .homework-card {
+    background: linear-gradient(135deg, rgba(6,182,212,0.06), rgba(244,63,94,0.04));
+    border: 1px solid rgba(6,182,212,0.22);
+    border-radius: 4px;
+    padding: 28px;
+    margin-top: 20px;
+  }
+
+  .homework-title { 
+    font-size: 20px; 
+    font-weight: 800; 
+    color: var(--accent); 
+    margin-bottom: 8px; 
+    letter-spacing: -0.5px; 
+  }
+
+  .top-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: rgba(10, 12, 18, 0.92);
+    padding: 0.85rem 0;
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .top-nav a {
+    color: #fff;
+    text-decoration: none;
+    padding: 0.55rem 0.95rem;
+    border-radius: 0.35rem;
+    background: rgba(255,255,255,0.08);
+    font-weight: 600;
+  }
+
+  .top-nav a:hover {
+    background: rgba(255,255,255,0.14);
+  }
+
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+    <nav class="top-nav">
+      <a href="Intro.html">Intro</a>
+      <a href="functions.html">Functions</a>
+      <a href="forLoops.html">For Loops</a>
+      <a href="conditionals.html">Conditionals</a>
+      <a href="listCollections.html">List Collections</a>
+      <a href="dictionaries.html">Dictionaries</a>
+      <a href="ModulesAnd_errorhandling.html">Modules & Error Handling</a>
+      <a href="apiAnd_fileHandling.html">APIs & File Handling</a>
+
+
+    </nav>
+    
+<header>
+  <div class="topic-badge">Session 2 of 2</div>
+  <h1>APIs & <br><span>File Handling</span></h1>
+  <div class="header-sub">Connect to the real world. Learn to read files, write data, and make your first API call to bring live data into your Python programs.</div>
+  <div class="header-meta">
+    <div class="meta-pill">2 HOURS</div>
+    <div class="meta-pill">FILES · REQUESTS · JSON</div>
+    <div class="meta-pill">#BUILDINPUBLIC</div>
+  </div>
+</header>
+
+<main>
+
+  <div class="goal-card">
+    <div class="goal-label">🎯 What You'll Be Able to Do After This</div>
+    <div class="goal-text">
+      You'll know how to <strong>read and write files</strong> to persist data between program runs, understand <strong>JSON</strong> (the universal data format for web APIs), and make your first <strong>HTTP request</strong> to fetch live data from the internet. By the end, you'll have built a real program that connects to an actual API.
+    </div>
+  </div>
+
+  <div class="concept-card" style="margin-top:24px;">
+    <div class="concept-header">
+      <div class="concept-title">File Handling — Reading & Writing Data</div>
+      <div class="time-tag">30 mins</div>
+    </div>
+
+    <div class="exercise-box">
+      <div class="exercise-label">Coming Soon</div>
+      <div class="exercise-text">This page is being built. Check back soon for detailed tutorials on file handling, API calls, and JSON parsing!</div>
+    </div>
+  </div>
+
+  <div class="homework-card">
+    <div class="homework-title">🚀 What's Next?</div>
+    <div style="font-size:14px;color:#b8c5d6;line-height:1.7;">
+      You've completed the fundamentals journey! Continue building real-world projects and explore advanced topics.
+    </div>
+  </div>
+
+</main>
+
+</body>
+</html>
