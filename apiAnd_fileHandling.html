@@ -3,20 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>APIs & File Handling — Python</title>
+<title>File Handling & Your First AI API Call — Python</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0d0f14;
-    --surface: #131820;
-    --surface2: #1a212d;
-    --border: #25344a;
-    --accent: #06b6d4;
-    --accent2: #f43f5e;
-    --accent3: #10b981;
-    --text: #e8f0ff;
-    --muted: #4a6480;
-    --code-bg: #0a0d12;
+    --bg: #090d12;
+    --surface: #0f1520;
+    --surface2: #151e2e;
+    --border: #1e2d45;
+    --accent: #38bdf8;
+    --accent2: #a78bfa;
+    --accent3: #34d399;
+    --accent4: #f472b6;
+    --text: #e8f4ff;
+    --muted: #3a5470;
+    --code-bg: #060a0f;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -39,30 +40,31 @@
   header::before {
     content: '';
     position: absolute;
-    top: -80px; right: -80px;
-    width: 440px; height: 440px;
-    background: radial-gradient(circle, rgba(6,182,212,0.09) 0%, transparent 70%);
+    top: -100px; right: -100px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(56,189,248,0.1) 0%, transparent 65%);
     pointer-events: none;
   }
 
   header::after {
     content: '';
     position: absolute;
-    bottom: -60px; left: 200px;
-    width: 300px; height: 300px;
-    background: radial-gradient(circle, rgba(244,63,94,0.06) 0%, transparent 70%);
+    bottom: -80px; left: 150px;
+    width: 350px; height: 350px;
+    background: radial-gradient(circle, rgba(167,139,250,0.07) 0%, transparent 65%);
     pointer-events: none;
   }
 
   .topic-badge {
     display: inline-flex;
     align-items: center;
-    background: var(--accent);
+    gap: 8px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
     color: #000;
     font-family: 'Space Mono', monospace;
     font-size: 11px;
     font-weight: 700;
-    padding: 4px 12px;
+    padding: 4px 14px;
     border-radius: 2px;
     letter-spacing: 2px;
     text-transform: uppercase;
@@ -76,7 +78,8 @@
     letter-spacing: -2px;
   }
 
-  header h1 span { color: var(--accent); }
+  header h1 .blue { color: var(--accent); }
+  header h1 .purple { color: var(--accent2); }
 
   .header-sub {
     font-size: 16px;
@@ -108,29 +111,67 @@
     padding: 40px 40px 80px;
   }
 
-  .goal-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
+  /* MILESTONE BANNER */
+  .milestone-banner {
+    background: linear-gradient(135deg, rgba(56,189,248,0.08), rgba(167,139,250,0.06));
+    border: 1px solid rgba(56,189,248,0.25);
     border-radius: 4px;
     padding: 28px;
-    margin: 20px 0;
+    margin-top: 40px;
+    margin-bottom: 40px;
+    position: relative;
+    overflow: hidden;
   }
 
-  .goal-label {
+  .milestone-banner::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3));
+  }
+
+  .milestone-label {
     font-family: 'Space Mono', monospace;
     font-size: 10px;
-    letter-spacing: 2px;
+    letter-spacing: 3px;
     text-transform: uppercase;
     color: var(--accent);
     margin-bottom: 12px;
   }
 
-  .goal-text {
-    font-size: 14px;
-    color: #b8c5d6;
+  .milestone-text {
+    font-size: 15px;
+    color: #5080a0;
     line-height: 1.7;
   }
 
+  .milestone-text strong { color: var(--text); }
+  .milestone-text em { color: var(--accent2); font-style: normal; font-weight: 600; }
+
+  /* SECTION HEADERS */
+  .section-label {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+    margin-top: 48px;
+  }
+
+  .section-number {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .section-divider { flex: 1; height: 1px; background: var(--border); }
+  .section-title { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+
+  /* CONCEPT CARDS */
   .concept-card {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -142,18 +183,11 @@
     transition: border-color 0.2s;
   }
 
-  .concept-card:hover {
-    border-color: var(--accent);
-  }
-
-  .concept-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0;
-    width: 3px;
-    height: 100%;
-    background: var(--accent);
-  }
+  .concept-card:hover { border-color: var(--accent); }
+  .concept-card::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: var(--accent); }
+  .concept-card.purple::before { background: var(--accent2); }
+  .concept-card.green::before { background: var(--accent3); }
+  .concept-card.pink::before { background: var(--accent4); }
 
   .concept-header {
     display: flex;
@@ -164,11 +198,7 @@
     flex-wrap: wrap;
   }
 
-  .concept-title {
-    font-size: 17px;
-    font-weight: 600;
-    letter-spacing: -0.3px;
-  }
+  .concept-title { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; }
 
   .time-tag {
     font-family: 'Space Mono', monospace;
@@ -181,77 +211,392 @@
     flex-shrink: 0;
   }
 
-  .exercise-box {
-    background: rgba(6, 182, 212, 0.05);
-    border: 1px solid rgba(6, 182, 212, 0.2);
-    border-radius: 4px;
-    padding: 16px 20px;
-    margin-top: 16px;
+  .student-voice {
+    font-size: 15px;
+    color: #3a6080;
+    line-height: 1.75;
+    margin-bottom: 20px;
   }
 
-  .exercise-label {
+  .student-voice strong { color: var(--accent); font-weight: 600; }
+  .student-voice em { color: var(--accent2); font-style: normal; font-weight: 600; }
+  .student-voice .g { color: var(--accent3); font-weight: 600; }
+
+  /* ANALOGY */
+  .analogy-box {
+    background: rgba(56,189,248,0.04);
+    border: 1px solid rgba(56,189,248,0.14);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 4px 4px 0;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    color: #3a6080;
+    line-height: 1.7;
+  }
+
+  .analogy-label {
     font-family: 'Space Mono', monospace;
     font-size: 10px;
     letter-spacing: 2px;
     text-transform: uppercase;
     color: var(--accent);
-    margin-bottom: 8px;
+    margin-bottom: 6px;
+  }
+
+  /* FILE MODE TABLE */
+  .mode-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+  }
+
+  .mode-table th {
+    text-align: left;
+    padding: 10px 16px;
+    background: var(--surface2);
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-size: 10px;
+    border: 1px solid var(--border);
+  }
+
+  .mode-table td {
+    padding: 11px 16px;
+    border: 1px solid var(--border);
+    vertical-align: top;
+    line-height: 1.6;
+    color: #3a6080;
+    font-size: 12px;
+  }
+
+  .mode-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .mode-key { color: var(--accent); font-weight: 700; }
+
+  /* CODE BLOCKS */
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 16px;
+  }
+
+  .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+  }
+
+  .code-dots { display: flex; gap: 6px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot.red { background: #ff5f57; }
+  .dot.yellow { background: #ffbd2e; }
+  .dot.green { background: #28c840; }
+
+  .code-filename { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted); }
+
+  .code-body {
+    padding: 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    line-height: 1.9;
+    overflow-x: auto;
+  }
+
+  .py-keyword  { color: #c792ea; }
+  .py-func     { color: #82aaff; }
+  .py-def      { color: #38bdf8; }
+  .py-string   { color: #c3e88d; }
+  .py-var      { color: #f8b500; }
+  .py-comment  { color: #1e3045; font-style: italic; }
+  .py-number   { color: #f78c6c; }
+  .py-fstring  { color: #89ddff; }
+  .py-param    { color: #ffcb6b; }
+  .py-op       { color: #fb923c; }
+  .py-module   { color: #34d399; }
+  .py-error    { color: #f87171; }
+  .py-method   { color: #38bdf8; }
+  .py-key      { color: #f472b6; }
+
+  .output-block {
+    background: #03070d;
+    border: 1px solid var(--border);
+    border-top: none;
+    padding: 16px 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    color: var(--accent);
+    line-height: 1.8;
+  }
+
+  .output-label { font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; }
+
+  /* API FLOW DIAGRAM */
+  .api-flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 24px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    margin: 16px 0;
+  }
+
+  .flow-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .flow-box {
+    padding: 12px 18px;
+    border-radius: 3px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    text-align: center;
+    min-width: 110px;
+  }
+
+  .flow-you    { background: rgba(56,189,248,0.1);  border: 1px solid rgba(56,189,248,0.3);  color: var(--accent); }
+  .flow-key    { background: rgba(244,114,182,0.1); border: 1px solid rgba(244,114,182,0.3); color: var(--accent4); }
+  .flow-req    { background: rgba(167,139,250,0.1); border: 1px solid rgba(167,139,250,0.3); color: var(--accent2); }
+  .flow-claude { background: rgba(52,211,153,0.1);  border: 1px solid rgba(52,211,153,0.3);  color: var(--accent3); }
+  .flow-resp   { background: rgba(248,180,0,0.1);   border: 1px solid rgba(248,180,0,0.3);   color: #f8b500; }
+
+  .flow-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-align: center;
+  }
+
+  .flow-arrow {
+    color: var(--muted);
+    font-size: 20px;
+    line-height: 1;
+    padding-bottom: 16px;
+  }
+
+  /* ENV FILE VISUAL */
+  .env-visual {
+    background: var(--code-bg);
+    border: 1px solid rgba(244,114,182,0.2);
+    border-left: 3px solid var(--accent4);
+    border-radius: 0 4px 4px 0;
+    padding: 16px 20px;
+    margin: 16px 0;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+  }
+
+  .env-filename {
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--accent4);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  /* CALLOUT */
+  .callout {
+    background: rgba(56,189,248,0.05);
+    border: 1px solid rgba(56,189,248,0.2);
+    border-radius: 4px;
+    padding: 16px 20px;
+    margin: 16px 0;
+    font-size: 14px;
+    color: #3a6080;
+    line-height: 1.7;
+  }
+
+  .callout-label { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 2px; color: var(--accent); margin-bottom: 6px; }
+
+  .callout.purple { background: rgba(167,139,250,0.05); border-color: rgba(167,139,250,0.2); color: #6050a0; }
+  .callout.purple .callout-label { color: var(--accent2); }
+
+  .callout.green { background: rgba(52,211,153,0.05); border-color: rgba(52,211,153,0.2); color: #305840; }
+  .callout.green .callout-label { color: var(--accent3); }
+
+  .callout.red { background: rgba(248,113,113,0.05); border-color: rgba(248,113,113,0.2); color: #804040; }
+  .callout.red .callout-label { color: #f87171; }
+
+  .callout.pink { background: rgba(244,114,182,0.05); border-color: rgba(244,114,182,0.2); color: #804060; }
+  .callout.pink .callout-label { color: var(--accent4); }
+
+  /* TRY IT */
+  .try-it {
+    background: rgba(56,189,248,0.04);
+    border: 1px solid rgba(56,189,248,0.14);
+    border-radius: 4px;
+    padding: 18px 20px;
+    margin-top: 18px;
+  }
+
+  .try-it-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 10px;
     display: flex;
     align-items: center;
     gap: 8px;
   }
 
-  .exercise-label::before {
-    content: '✦';
-    font-size: 12px;
+  .try-it-label::before { content: '▶'; font-size: 10px; }
+  .try-it-text { font-size: 14px; color: #3a6080; line-height: 1.7; }
+
+  /* PROJECT */
+  .project-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 32px;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 20px;
   }
 
-  .exercise-text {
+  .project-banner {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3));
+  }
+
+  .project-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    background: rgba(56,189,248,0.08);
+    padding: 4px 10px;
+    border: 1px solid rgba(56,189,248,0.22);
+    border-radius: 2px;
+    display: inline-block;
+    margin-bottom: 16px;
+  }
+
+  .project-title { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 6px; }
+  .project-subtitle { font-size: 14px; color: var(--muted); margin-bottom: 20px; }
+
+  /* STEP LIST */
+  .step-list { list-style: none; margin: 16px 0; }
+
+  .step-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
     font-size: 14px;
-    color: #b8c5d6;
+    color: #3a6080;
     line-height: 1.6;
   }
 
+  .step-list li:last-child { border-bottom: none; }
+
+  .step-num {
+    width: 26px; height: 26px;
+    background: rgba(56,189,248,0.1);
+    border: 1px solid rgba(56,189,248,0.25);
+    border-radius: 2px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* CHECKLIST */
+  .checklist { list-style: none; margin-top: 20px; }
+
+  .checklist li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    color: #3a6080;
+    line-height: 1.5;
+  }
+
+  .checklist li:last-child { border-bottom: none; }
+
+  .check-box {
+    width: 18px; height: 18px;
+    border: 1.5px solid var(--border);
+    border-radius: 2px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  /* RESPONSE ANATOMY */
+  .response-anatomy {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 20px;
+    margin: 16px 0;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    line-height: 1.9;
+  }
+
+  .ra-key   { color: var(--accent4); }
+  .ra-value { color: #c3e88d; }
+  .ra-note  { color: var(--muted); font-style: italic; font-size: 11px; }
+  .ra-arrow { color: var(--muted); }
+
+  /* HOMEWORK */
   .homework-card {
-    background: linear-gradient(135deg, rgba(6,182,212,0.06), rgba(244,63,94,0.04));
-    border: 1px solid rgba(6,182,212,0.22);
+    background: linear-gradient(135deg, rgba(56,189,248,0.06), rgba(167,139,250,0.04));
+    border: 1px solid rgba(56,189,248,0.22);
     border-radius: 4px;
     padding: 28px;
     margin-top: 20px;
   }
 
-  .homework-title { 
-    font-size: 20px; 
-    font-weight: 800; 
-    color: var(--accent); 
-    margin-bottom: 8px; 
-    letter-spacing: -0.5px; 
+  .homework-title { font-size: 20px; font-weight: 800; color: var(--accent); margin-bottom: 8px; letter-spacing: -0.5px; }
+
+  .tweet-preview {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 20px;
+    margin-top: 16px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text);
   }
 
-  .top-nav {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    background: rgba(10, 12, 18, 0.92);
-    padding: 0.85rem 0;
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(255,255,255,0.06);
-  }
+  .tweet-preview .hashtag { color: #4aa0f0; font-weight: 600; }
 
-  .top-nav a {
-    color: #fff;
-    text-decoration: none;
-    padding: 0.55rem 0.95rem;
-    border-radius: 0.35rem;
-    background: rgba(255,255,255,0.08);
-    font-weight: 600;
-  }
-
-  .top-nav a:hover {
-    background: rgba(255,255,255,0.14);
+  code {
+    background: var(--surface2);
+    padding: 2px 8px;
+    border-radius: 2px;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
   }
 
   ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -261,59 +606,446 @@
 </head>
 <body>
 
-    <nav class="top-nav">
-      <a href="Intro.html">Intro</a>
-      <a href="functions.html">Functions</a>
-      <a href="forLoops.html">For Loops</a>
-      <a href="conditionals.html">Conditionals</a>
-      <a href="listCollections.html">List Collections</a>
-      <a href="dictionaries.html">Dictionaries</a>
-      <a href="ModulesAnd_errorhandling.html">Modules & Error Handling</a>
-      <a href="apiAnd_fileHandling.html">APIs & File Handling</a>
-
-
-    </nav>
-    
 <header>
-  <div class="topic-badge">Session 2 of 2</div>
-  <h1>APIs & <br><span>File Handling</span></h1>
-  <div class="header-sub">Connect to the real world. Learn to read files, write data, and make your first API call to bring live data into your Python programs.</div>
+  <div class="topic-badge">Session 2 of 2 — The Big One</div>
+  <h1><span class="blue">File Handling</span> &<br><span class="purple">Your First AI API Call</span></h1>
+  <div class="header-sub">Read and write files with Python — then call a real AI model and get a response back. This is what everything has been building toward.</div>
   <div class="header-meta">
     <div class="meta-pill">2 HOURS</div>
-    <div class="meta-pill">FILES · REQUESTS · JSON</div>
-    <div class="meta-pill">#BUILDINPUBLIC</div>
+    <div class="meta-pill">FILES · .ENV · CLAUDE API</div>
+    <div class="meta-pill">🚀 MILESTONE SESSION</div>
   </div>
 </header>
 
 <main>
 
-  <div class="goal-card">
-    <div class="goal-label">🎯 What You'll Be Able to Do After This</div>
-    <div class="goal-text">
-      You'll know how to <strong>read and write files</strong> to persist data between program runs, understand <strong>JSON</strong> (the universal data format for web APIs), and make your first <strong>HTTP request</strong> to fetch live data from the internet. By the end, you'll have built a real program that connects to an actual API.
+  <div class="milestone-banner">
+    <div class="milestone-label">🎯 Milestone Session</div>
+    <div class="milestone-text">
+      You've spent the last few sessions building the foundation — <strong>variables, functions, loops, lists, dictionaries, modules, error handling</strong>. Today you use all of it together. By the end of this session you will have <em>sent a message to a real AI model from your own Python script</em> and received a response back. That is AI engineering. That is the job. Let's go.
     </div>
   </div>
+
+  <!-- PART 1 — FILE HANDLING -->
+  <div class="section-label">
+    <div class="section-number">Part 01</div>
+    <div class="section-divider"></div>
+  </div>
+  <div class="section-title">File Handling — Reading & Writing Files</div>
 
   <div class="concept-card" style="margin-top:24px;">
     <div class="concept-header">
-      <div class="concept-title">File Handling — Reading & Writing Data</div>
-      <div class="time-tag">30 mins</div>
+      <div class="concept-title">Why Files Matter in AI Engineering</div>
+      <div class="time-tag">20 mins</div>
     </div>
 
-    <div class="exercise-box">
-      <div class="exercise-label">Coming Soon</div>
-      <div class="exercise-text">This page is being built. Check back soon for detailed tutorials on file handling, API calls, and JSON parsing!</div>
+    <div class="analogy-box">
+      <div class="analogy-label">💡 Think of it this way</div>
+      Everything you've built so far lives and dies when your script runs. The moment it stops, your data is gone. <strong>Files are how you make data persist</strong> — save results, load inputs, store logs. In AI automation, you'll constantly be reading documents to send to an AI, and writing AI responses back to files. This is the skill that turns a one-time script into a real tool.
+    </div>
+
+    <div class="student-voice">
+      Python opens files using the <code>open()</code> function. You always specify two things: <strong>the file path</strong> and the <strong>mode</strong> — what you want to do with the file. Always use the <code>with</code> keyword when opening files — it automatically closes the file when you're done, even if something goes wrong.
+    </div>
+
+    <table class="mode-table">
+      <thead>
+        <tr><th>Mode</th><th>What it does</th><th>File must exist?</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="mode-key">"r"</span></td><td>Read only — can't modify</td><td>Yes — error if not found</td></tr>
+        <tr><td><span class="mode-key">"w"</span></td><td>Write — creates file or overwrites existing</td><td>No — creates it</td></tr>
+        <tr><td><span class="mode-key">"a"</span></td><td>Append — adds to the end without overwriting</td><td>No — creates it</td></tr>
+        <tr><td><span class="mode-key">"r+"</span></td><td>Read and write</td><td>Yes</td></tr>
+      </tbody>
+    </table>
+
+    <div class="code-block" style="margin-top:20px;">
+      <div class="code-header">
+        <div class="code-dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div>
+        <div class="code-filename">file_handling.py</div>
+      </div>
+      <div class="code-body">
+<span class="py-comment"># WRITING a file — creates it if it doesn't exist</span><br>
+<span class="py-keyword">with</span> <span class="py-func">open</span>(<span class="py-string">"notes.txt"</span>, <span class="py-string">"w"</span>) <span class="py-keyword">as</span> <span class="py-var">f</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">f</span>.<span class="py-method">write</span>(<span class="py-string">"Day 1: Learned variables and functions\n"</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">f</span>.<span class="py-method">write</span>(<span class="py-string">"Day 2: Learned loops and conditionals\n"</span>)<br><br>
+<span class="py-comment"># READING a file — all at once</span><br>
+<span class="py-keyword">with</span> <span class="py-func">open</span>(<span class="py-string">"notes.txt"</span>, <span class="py-string">"r"</span>) <span class="py-keyword">as</span> <span class="py-var">f</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">content</span> = <span class="py-var">f</span>.<span class="py-method">read</span>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-var">content</span>)<br><br>
+<span class="py-comment"># READING line by line — memory efficient for large files</span><br>
+<span class="py-keyword">with</span> <span class="py-func">open</span>(<span class="py-string">"notes.txt"</span>, <span class="py-string">"r"</span>) <span class="py-keyword">as</span> <span class="py-var">f</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">for</span> <span class="py-var">line</span> <span class="py-keyword">in</span> <span class="py-var">f</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-fstring">f"→ {<span class="py-var">line</span>.strip()}"</span>)<br><br>
+<span class="py-comment"># APPENDING — adds to the file without wiping it</span><br>
+<span class="py-keyword">with</span> <span class="py-func">open</span>(<span class="py-string">"notes.txt"</span>, <span class="py-string">"a"</span>) <span class="py-keyword">as</span> <span class="py-var">f</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">f</span>.<span class="py-method">write</span>(<span class="py-string">"Day 3: Called the Claude API!\n"</span>)<br><br>
+<span class="py-comment"># Always wrap file operations in try/except</span><br>
+<span class="py-keyword">try</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">with</span> <span class="py-func">open</span>(<span class="py-string">"missing.txt"</span>, <span class="py-string">"r"</span>) <span class="py-keyword">as</span> <span class="py-var">f</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-var">f</span>.<span class="py-method">read</span>())<br>
+<span class="py-keyword">except</span> <span class="py-error">FileNotFoundError</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-string">"❌ File not found — check the path."</span>)
+      </div>
+    </div>
+    <div class="output-block">
+      <div class="output-label">Output</div>
+      Day 1: Learned variables and functions<br>
+      Day 2: Learned loops and conditionals<br><br>
+      → Day 1: Learned variables and functions<br>
+      → Day 2: Learned loops and conditionals<br><br>
+      ❌ File not found — check the path.
+    </div>
+
+    <div class="callout green">
+      <div class="callout-label">🔗 How this connects to AI engineering</div>
+      In real automations you'll read a PDF or text file, send its contents to an AI model, then write the AI's response back to a new file. The pattern is always: <strong>read file → build prompt → call API → write response</strong>. You're learning that exact pattern today.
+    </div>
+
+    <div class="try-it">
+      <div class="try-it-label">Try It</div>
+      <div class="try-it-text">Create a file called <code>my_journey.txt</code> and write at least 5 lines — one for each major thing you've learned so far. Then read it back and print each line with its line number using <code>enumerate()</code>. Finally, append today's date using the <code>datetime</code> module from last session.</div>
     </div>
   </div>
 
+  <!-- PART 2 — ENV FILES -->
+  <div class="section-label">
+    <div class="section-number">Part 02</div>
+    <div class="section-divider"></div>
+  </div>
+  <div class="section-title">API Keys & .env Files — Keeping Secrets Safe</div>
+
+  <div class="concept-card purple">
+    <div class="concept-header">
+      <div class="concept-title">Never Hard-Code Your API Key — Here's What to Do Instead</div>
+      <div class="time-tag">15 mins</div>
+    </div>
+
+    <div class="student-voice">
+      To call the Claude API you need an <strong>API key</strong> — a secret string that authenticates your requests. The golden rule: <em>never paste your API key directly into your Python code.</em> If you push that code to GitHub, your key is exposed to the entire internet and anyone can use it at your expense. Instead, you store it in a <strong>.env file</strong> — a hidden file that never gets committed to GitHub.
+    </div>
+
+    <ul class="step-list">
+      <li>
+        <div class="step-num">1</div>
+        <div>Go to <strong>console.anthropic.com</strong>, sign in, and create a new API key. Copy it — you only see it once.</div>
+      </li>
+      <li>
+        <div class="step-num">2</div>
+        <div>Create a file called <code>.env</code> in your project folder (the dot at the start makes it hidden on Mac/Linux).</div>
+      </li>
+      <li>
+        <div class="step-num">3</div>
+        <div>Add your key to the file in this format — no quotes, no spaces around the equals sign.</div>
+      </li>
+      <li>
+        <div class="step-num">4</div>
+        <div>Create a <code>.gitignore</code> file and add <code>.env</code> to it so Git never commits your secrets.</div>
+      </li>
+      <li>
+        <div class="step-num">5</div>
+        <div>Use <code>python-dotenv</code> in your script to load the key — then read it with <code>os.environ.get()</code>.</div>
+      </li>
+    </ul>
+
+    <div class="env-visual">
+      <div class="env-filename">.env — never commit this file</div>
+      <span style="color:#f472b6;">ANTHROPIC_API_KEY</span>=<span style="color:#c3e88d;">sk-ant-your-key-goes-here</span>
+    </div>
+
+    <div class="env-visual" style="margin-top:8px;border-left-color:var(--accent3);">
+      <div class="env-filename" style="color:var(--accent3);">.gitignore — always commit this file</div>
+      <span style="color:#34d399;">.env</span><br>
+      <span style="color:#34d399;">__pycache__/</span><br>
+      <span style="color:#34d399;">*.pyc</span>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div>
+        <div class="code-filename">load_key.py — how to read your key safely</div>
+      </div>
+      <div class="code-body">
+<span class="py-keyword">import</span> <span class="py-module">os</span><br>
+<span class="py-keyword">from</span> <span class="py-module">dotenv</span> <span class="py-keyword">import</span> load_dotenv<br><br>
+<span class="py-comment"># Load the .env file into memory</span><br>
+<span class="py-func">load_dotenv</span>()<br><br>
+<span class="py-comment"># Read the key — never print this in real code!</span><br>
+<span class="py-var">api_key</span> = <span class="py-module">os</span>.environ.<span class="py-method">get</span>(<span class="py-string">"ANTHROPIC_API_KEY"</span>)<br><br>
+<span class="py-keyword">if</span> <span class="py-keyword">not</span> <span class="py-var">api_key</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-string">"❌ No API key found. Check your .env file."</span>)<br>
+<span class="py-keyword">else</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-string">"✅ API key loaded successfully."</span>)
+      </div>
+    </div>
+
+    <div class="callout red">
+      <div class="callout-label">⚠️ Critical Security Rule</div>
+      Never print your actual API key. Never paste it into your code. Never commit your <code>.env</code> file. If you accidentally expose a key, go to console.anthropic.com immediately and delete it, then create a new one. Treat your API key like a password.
+    </div>
+
+    <div class="try-it">
+      <div class="try-it-label">Try It — Set Up Before Moving On</div>
+      <div class="try-it-text">
+        Do all five steps above right now before continuing. Create your <code>.env</code> file, add your key, create your <code>.gitignore</code>, and run <code>load_key.py</code> to confirm it loads successfully. Don't move to Part 3 until you see the <em>✅ API key loaded successfully</em> message.
+      </div>
+    </div>
+  </div>
+
+  <!-- PART 3 — API CALL -->
+  <div class="section-label">
+    <div class="section-number">Part 03</div>
+    <div class="section-divider"></div>
+  </div>
+  <div class="section-title">Your First Claude API Call</div>
+
+  <div class="concept-card green">
+    <div class="concept-header">
+      <div class="concept-title">How an API Call Works — The Full Picture</div>
+      <div class="time-tag">15 mins</div>
+    </div>
+
+    <div class="student-voice">
+      An API call is just your Python script <strong>sending a message to a server</strong> and getting a response back. With the Claude API you send a message (your prompt), and the server runs Claude and sends back the response. Everything travels as a <em>dictionary</em> — the request is a dict you build, the response is a dict you read. Everything you've learned about dictionaries is about to become real.
+    </div>
+
+    <div class="api-flow">
+      <div class="flow-node">
+        <div class="flow-box flow-you">Your Script</div>
+        <div class="flow-label">builds the request</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">
+        <div class="flow-box flow-key">API Key</div>
+        <div class="flow-label">authenticates you</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">
+        <div class="flow-box flow-req">HTTP Request</div>
+        <div class="flow-label">sent over internet</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">
+        <div class="flow-box flow-claude">Claude API</div>
+        <div class="flow-label">runs the model</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">
+        <div class="flow-box flow-resp">Response Dict</div>
+        <div class="flow-label">back to your script</div>
+      </div>
+    </div>
+
+    <div class="student-voice">
+      The response comes back as a nested object. Here's what the important parts look like — notice how it's the same nested structure you learned in the Dictionaries session:
+    </div>
+
+    <div class="response-anatomy">
+      <div style="color:var(--muted);margin-bottom:8px;font-size:11px;letter-spacing:1px;">RESPONSE OBJECT STRUCTURE</div>
+      response {<br>
+      &nbsp;&nbsp;<span class="ra-key">"id"</span>: <span class="ra-value">"msg_abc123..."</span> <span class="ra-arrow">←</span> <span class="ra-note">unique message ID</span><br>
+      &nbsp;&nbsp;<span class="ra-key">"model"</span>: <span class="ra-value">"claude-sonnet-4-5"</span> <span class="ra-arrow">←</span> <span class="ra-note">which model responded</span><br>
+      &nbsp;&nbsp;<span class="ra-key">"content"</span>: [<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;{<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="ra-key">"type"</span>: <span class="ra-value">"text"</span>,<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="ra-key">"text"</span>: <span class="ra-value">"The actual AI response is here"</span> <span class="ra-arrow">←</span> <span class="ra-note">this is what you want</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+      &nbsp;&nbsp;],<br>
+      &nbsp;&nbsp;<span class="ra-key">"usage"</span>: {<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="ra-key">"input_tokens"</span>: <span class="ra-value">25</span>, <span class="ra-note">← tokens you sent</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="ra-key">"output_tokens"</span>: <span class="ra-value">142</span> <span class="ra-note">← tokens in the response</span><br>
+      &nbsp;&nbsp;}<br>
+      }
+    </div>
+
+    <div class="callout purple">
+      <div class="callout-label">💡 What is a token?</div>
+      AI models don't read word by word — they read in <strong>tokens</strong>, which are roughly 3–4 characters each. "Hello world" is about 2 tokens. APIs charge per token, so knowing how many you're using helps you manage cost. For now, just know the number is in <code>response.usage</code>.
+    </div>
+  </div>
+
+  <!-- CONCEPT: First API Call -->
+  <div class="concept-card pink">
+    <div class="concept-header">
+      <div class="concept-title">Writing Your First API Call — Step by Step</div>
+      <div class="time-tag">30 mins</div>
+    </div>
+
+    <div class="student-voice">
+      Now you write it. Every line below is explained — read it carefully before running it. This is the most important piece of code you've written so far.
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div>
+        <div class="code-filename">first_api_call.py</div>
+      </div>
+      <div class="code-body">
+<span class="py-keyword">import</span> <span class="py-module">os</span><br>
+<span class="py-keyword">import</span> <span class="py-module">anthropic</span><br>
+<span class="py-keyword">from</span> <span class="py-module">dotenv</span> <span class="py-keyword">import</span> load_dotenv<br><br>
+<span class="py-comment"># Step 1 — Load your API key from .env</span><br>
+<span class="py-func">load_dotenv</span>()<br><br>
+<span class="py-comment"># Step 2 — Create the client (your connection to Claude)</span><br>
+<span class="py-var">client</span> = <span class="py-module">anthropic</span>.Anthropic(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;api_key=<span class="py-module">os</span>.environ.<span class="py-method">get</span>(<span class="py-string">"ANTHROPIC_API_KEY"</span>)<br>
+)<br><br>
+<span class="py-comment"># Step 3 — Send a message and get a response</span><br>
+<span class="py-var">response</span> = <span class="py-var">client</span>.messages.<span class="py-method">create</span>(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;model=<span class="py-string">"claude-haiku-4-5-20251001"</span>,    <span class="py-comment"># fastest & cheapest model</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;max_tokens=<span class="py-number">1024</span>,              <span class="py-comment"># max length of response</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;messages=[                    <span class="py-comment"># a list of message dicts</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-key">"role"</span>: <span class="py-string">"user"</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-key">"content"</span>: <span class="py-string">"In one sentence, what is AI engineering?"</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;]<br>
+)<br><br>
+<span class="py-comment"># Step 4 — Extract the text from the response</span><br>
+<span class="py-var">ai_reply</span> = <span class="py-var">response</span>.content[<span class="py-number">0</span>].text<br><br>
+<span class="py-comment"># Step 5 — Print it</span><br>
+<span class="py-func">print</span>(<span class="py-string">"Claude says:"</span>)<br>
+<span class="py-func">print</span>(<span class="py-var">ai_reply</span>)<br>
+<span class="py-func">print</span>(<span class="py-fstring">f"\nTokens used: {<span class="py-var">response</span>.usage.input_tokens} in, {<span class="py-var">response</span>.usage.output_tokens} out"</span>)
+      </div>
+    </div>
+    <div class="output-block">
+      <div class="output-label">Example Output</div>
+      Claude says:<br>
+      AI engineering is the practice of building, deploying, and maintaining<br>
+      systems that leverage artificial intelligence models to solve real-world<br>
+      problems through code, APIs, and automation pipelines.<br><br>
+      Tokens used: 18 in, 42 out
+    </div>
+
+    <div class="callout green">
+      <div class="callout-label">✅ You just called a real AI from Python</div>
+      Let that land for a second. You wrote a Python script that authenticated with an API, sent a message to one of the world's most capable AI models, and got a response back — all in under 20 lines of code. This is what AI engineers do every single day.
+    </div>
+
+    <div class="try-it">
+      <div class="try-it-label">Try It — Make It Yours</div>
+      <div class="try-it-text">
+        Change the prompt to something that matters to you — ask Claude about AI automation, about your career path, about something you're curious about. Run it three times with different questions. Then try changing <code>max_tokens</code> to 100 and see how the response gets cut off. Understanding these parameters is part of the job.
+      </div>
+    </div>
+  </div>
+
+  <!-- PART 4 — PROJECT -->
+  <div class="section-label">
+    <div class="section-number">Part 04</div>
+    <div class="section-divider"></div>
+  </div>
+  <div class="section-title">Today's Project</div>
+
+  <div class="project-card" style="margin-top:24px;">
+    <div class="project-banner"></div>
+    <div class="project-label">MILESTONE BUILD</div>
+    <div class="project-title">The AI Journal Summariser</div>
+    <div class="project-subtitle">File handling + Claude API + everything you know — 40 mins</div>
+
+    <div class="student-voice" style="margin-bottom:0;">
+      You're going to build a real AI-powered tool. It reads a text file you've written, sends the contents to Claude, and asks it to summarise and reflect on your learning progress. Then it saves the AI's response to a new file. This is a complete AI automation pipeline — input file, AI processing, output file. A real thing that real AI engineers build.
+    </div>
+
+    <div class="code-block" style="margin-top:20px;">
+      <div class="code-header">
+        <div class="code-dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div>
+        <div class="code-filename">journal_summariser.py</div>
+      </div>
+      <div class="code-body">
+<span class="py-keyword">import</span> <span class="py-module">os</span><br>
+<span class="py-keyword">import</span> <span class="py-module">anthropic</span><br>
+<span class="py-keyword">from</span> <span class="py-module">dotenv</span> <span class="py-keyword">import</span> load_dotenv<br>
+<span class="py-keyword">from</span> <span class="py-module">datetime</span> <span class="py-keyword">import</span> datetime<br><br>
+<span class="py-func">load_dotenv</span>()<br>
+<span class="py-var">client</span> = <span class="py-module">anthropic</span>.Anthropic(api_key=<span class="py-module">os</span>.environ.<span class="py-method">get</span>(<span class="py-string">"ANTHROPIC_API_KEY"</span>))<br><br>
+<span class="py-keyword">def</span> <span class="py-def">read_journal</span>(<span class="py-param">filepath</span>):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">try</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">with</span> <span class="py-func">open</span>(<span class="py-param">filepath</span>, <span class="py-string">"r"</span>) <span class="py-keyword">as</span> <span class="py-var">f</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">return</span> <span class="py-var">f</span>.<span class="py-method">read</span>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">except</span> <span class="py-error">FileNotFoundError</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-fstring">f"❌ File '{<span class="py-param">filepath</span>}' not found."</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">return</span> <span class="py-keyword">None</span><br><br>
+<span class="py-keyword">def</span> <span class="py-def">summarise_with_claude</span>(<span class="py-param">journal_text</span>):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-string">"⏳ Sending to Claude..."</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">try</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">response</span> = <span class="py-var">client</span>.messages.<span class="py-method">create</span>(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;model=<span class="py-string">"claude-haiku-4-5-20251001"</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;max_tokens=<span class="py-number">1024</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;messages=[{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-key">"role"</span>: <span class="py-string">"user"</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-key">"content"</span>: <span class="py-fstring">f"You are a supportive coding mentor. Read this student's learning journal and give them: 1) A short summary of their progress, 2) What they should be proud of, 3) One clear recommendation for what to focus on next.\n\nJournal:\n{<span class="py-param">journal_text</span>}"</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">return</span> <span class="py-var">response</span>.content[<span class="py-number">0</span>].text<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">except</span> <span class="py-error">Exception</span> <span class="py-keyword">as</span> <span class="py-var">e</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-fstring">f"❌ API error: {<span class="py-var">e</span>}"</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">return</span> <span class="py-keyword">None</span><br><br>
+<span class="py-keyword">def</span> <span class="py-def">save_summary</span>(<span class="py-param">summary</span>, <span class="py-param">output_path</span>):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">timestamp</span> = datetime.now().strftime(<span class="py-string">"%d %b %Y %H:%M"</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">with</span> <span class="py-func">open</span>(<span class="py-param">output_path</span>, <span class="py-string">"w"</span>) <span class="py-keyword">as</span> <span class="py-var">f</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">f</span>.<span class="py-method">write</span>(<span class="py-fstring">f"AI Mentor Feedback — {<span class="py-var">timestamp</span>}\n"</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">f</span>.<span class="py-method">write</span>(<span class="py-string">"="*40 + "\n\n"</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">f</span>.<span class="py-method">write</span>(<span class="py-param">summary</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-fstring">f"✅ Saved to '{<span class="py-param">output_path</span>}'"</span>)<br><br>
+<span class="py-comment"># --- Run the pipeline ---</span><br>
+<span class="py-var">journal</span> = <span class="py-def">read_journal</span>(<span class="py-string">"my_journey.txt"</span>)<br><br>
+<span class="py-keyword">if</span> <span class="py-var">journal</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">summary</span> = <span class="py-def">summarise_with_claude</span>(<span class="py-var">journal</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">if</span> <span class="py-var">summary</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-string">"\n--- Claude's Feedback ---"</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-var">summary</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-def">save_summary</span>(<span class="py-var">summary</span>, <span class="py-string">"ai_feedback.txt"</span>)
+      </div>
+    </div>
+
+    <div class="output-block">
+      <div class="output-label">Example Output</div>
+      ⏳ Sending to Claude...<br><br>
+      --- Claude's Feedback ---<br>
+      <span style="color:#c3e88d;">Summary: In just 11 days you've covered the core building blocks of Python —<br>
+      variables, functions, conditionals, loops, lists, and dictionaries. That's<br>
+      a genuinely strong foundation for AI engineering work...</span><br><br>
+      ✅ Saved to 'ai_feedback.txt'
+    </div>
+
+    <div class="callout" style="background:rgba(167,139,250,0.05);border-color:rgba(167,139,250,0.2);color:#6050a0;margin-top:20px;">
+      <div class="callout-label" style="color:var(--accent2);">🔥 STRETCH CHALLENGE</div>
+      Add a <strong>while loop</strong> that lets you keep asking Claude follow-up questions about your journal after the summary. Each exchange should be appended to <code>ai_feedback.txt</code> with a timestamp. You've just built a persistent AI conversation with memory — that is a real AI automation pattern.
+    </div>
+
+    <ul class="checklist">
+      <li><div class="check-box"></div><code>.env</code> file created with API key, <code>.gitignore</code> excludes it</li>
+      <li><div class="check-box"></div><code>my_journey.txt</code> written with at least 5 lines of real learning notes</li>
+      <li><div class="check-box"></div><code>read_journal()</code> uses <code>try/except FileNotFoundError</code></li>
+      <li><div class="check-box"></div><code>summarise_with_claude()</code> sends the file contents as a prompt</li>
+      <li><div class="check-box"></div>Response extracted correctly with <code>response.content[0].text</code></li>
+      <li><div class="check-box"></div><code>save_summary()</code> writes Claude's response to <code>ai_feedback.txt</code> with a timestamp</li>
+      <li><div class="check-box"></div>All three functions called in sequence — the full pipeline runs end to end</li>
+      <li><div class="check-box"></div>Stretch: follow-up question loop added and appending to the output file</li>
+    </ul>
+  </div>
+
+  <!-- HOMEWORK -->
   <div class="homework-card">
-    <div class="homework-title">🚀 What's Next?</div>
-    <div style="font-size:14px;color:#b8c5d6;line-height:1.7;">
-      You've completed the fundamentals journey! Continue building real-world projects and explore advanced topics.
+    <div class="homework-title">🚀 Build in Public — This One Matters</div>
+    <div style="font-size:14px;color:#2a5070;margin-bottom:20px;line-height:1.7;">
+      This is the most impressive thing you've built so far. Post it properly.
+    </div>
+
+    <ul class="checklist">
+      <li><div class="check-box"></div><div><strong style="color:var(--text);">GitHub:</strong> Push <code>journal_summariser.py</code> and <code>my_journey.txt</code> to your repo. <strong>Do not push <code>.env</code> — your <code>.gitignore</code> should prevent this automatically. Double check.</strong> Commit message: <em>"Milestone: AI journal summariser — file handling + Claude API"</em></div></li>
+      <li><div class="check-box"></div><div><strong style="color:var(--text);">Screenshot:</strong> Show the terminal output of Claude's feedback. This is the one to screenshot — an actual AI response generated by your own code is the most shareable thing yet.</div></li>
+      <li><div class="check-box"></div><div><strong style="color:var(--text);">Post on X:</strong> Use the caption below — or write your own. This post deserves a personal touch.</div></li>
+    </ul>
+
+    <div class="tweet-preview">
+      Milestone unlocked. Today I made my first real AI API call from a Python script I wrote myself. Built a tool that reads my learning journal, sends it to Claude, gets back a personalised summary of my progress, and saves it to a file. That's a complete AI automation pipeline. And I'm just getting started. 🤖🔥 <span class="hashtag">#100DaysOfCode</span> <span class="hashtag">#Python</span> <span class="hashtag">#BuildInPublic</span> <span class="hashtag">#AIEngineering</span> <span class="hashtag">#ClaudeAPI</span>
     </div>
   </div>
 
 </main>
-
 </body>
 </html>
