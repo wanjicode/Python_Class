@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modules & Error Handling — Python</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0d0a;
+    --surface: #18160f;
+    --surface2: #221f14;
+    --border: #352f1e;
+    --accent: #f59e0b;
+    --accent2: #60a5fa;
+    --accent3: #34d399;
+    --text: #f5f0e8;
+    --muted: #706040;
+    --code-bg: #0a0900;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  header {
+    padding: 60px 40px 40px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  header::before {
+    content: '';
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 440px; height: 440px;
+    background: radial-gradient(circle, rgba(245,158,11,0.09) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  header::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; left: 200px;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(96,165,250,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .topic-badge {
+    display: inline-flex;
+    align-items: center;
+    background: var(--accent);
+    color: #000;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 2px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  header h1 {
+    font-size: clamp(32px, 5.5vw, 60px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -2px;
+  }
+
+  header h1 span { color: var(--accent); }
+
+  .header-sub {
+    font-size: 16px;
+    color: var(--muted);
+    margin-top: 14px;
+    max-width: 580px;
+    line-height: 1.6;
+  }
+
+  .header-meta {
+    display: flex;
+    gap: 16px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+
+  .meta-pill {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    padding: 4px 12px;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+  }
+
+  /* NEXT SESSION BANNER */
+  .next-session {
+    background: rgba(96,165,250,0.05);
+    border: 1px solid rgba(96,165,250,0.2);
+    border-radius: 4px;
+    padding: 18px 24px;
+    margin-bottom: 32px;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .next-session-icon { font-size: 22px; flex-shrink: 0; margin-top: 2px; }
+
+  .next-session-text { font-size: 14px; color: #5080a0; line-height: 1.6; }
+  .next-session-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent2);
+    margin-bottom: 4px;
+  }
+
+  main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 40px 80px;
+  }
+
+  /* GOAL CARD */
+  .goal-card {
+    background: rgba(245,158,11,0.05);
+    border: 1px solid rgba(245,158,11,0.2);
+    border-radius: 4px;
+    padding: 24px;
+    margin-top: 40px;
+    margin-bottom: 40px;
+  }
+
+  .goal-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+
+  .goal-text { font-size: 15px; color: #b09060; line-height: 1.7; }
+  .goal-text strong { color: var(--text); }
+
+  /* SECTION HEADERS */
+  .section-label {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+    margin-top: 48px;
+  }
+
+  .section-number {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .section-divider { flex: 1; height: 1px; background: var(--border); }
+  .section-title { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+
+  /* CONCEPT CARDS */
+  .concept-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 28px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .concept-card:hover { border-color: var(--accent); }
+  .concept-card::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: var(--accent); }
+  .concept-card.blue::before { background: var(--accent2); }
+  .concept-card.green::before { background: var(--accent3); }
+  .concept-card.red::before { background: #f87171; }
+
+  .concept-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .concept-title { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; }
+
+  .time-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    background: var(--surface2);
+    padding: 3px 10px;
+    border-radius: 2px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .student-voice {
+    font-size: 15px;
+    color: #907060;
+    line-height: 1.75;
+    margin-bottom: 20px;
+  }
+
+  .student-voice strong { color: var(--accent); font-weight: 600; }
+  .student-voice em { color: var(--accent2); font-style: normal; font-weight: 600; }
+
+  /* ANALOGY */
+  .analogy-box {
+    background: rgba(245,158,11,0.04);
+    border: 1px solid rgba(245,158,11,0.14);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 4px 4px 0;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    color: #907050;
+    line-height: 1.7;
+  }
+
+  .analogy-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+
+  /* CODE BLOCKS */
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 16px;
+  }
+
+  .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+  }
+
+  .code-dots { display: flex; gap: 6px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot.red { background: #ff5f57; }
+  .dot.yellow { background: #ffbd2e; }
+  .dot.green { background: #28c840; }
+
+  .code-filename { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted); }
+
+  .code-body {
+    padding: 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    line-height: 1.9;
+    overflow-x: auto;
+  }
+
+  .py-keyword { color: #c792ea; }
+  .py-func { color: #82aaff; }
+  .py-def { color: #f59e0b; }
+  .py-string { color: #c3e88d; }
+  .py-var { color: #f8b500; }
+  .py-comment { color: #3a3010; font-style: italic; }
+  .py-number { color: #f78c6c; }
+  .py-fstring { color: #89ddff; }
+  .py-param { color: #ffcb6b; }
+  .py-op { color: #fb923c; }
+  .py-module { color: #34d399; }
+  .py-error { color: #f87171; }
+  .py-method { color: #f59e0b; }
+
+  .output-block {
+    background: #060500;
+    border: 1px solid var(--border);
+    border-top: none;
+    padding: 16px 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    color: var(--accent);
+    line-height: 1.8;
+  }
+
+  .output-label { font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; }
+
+  /* MODULE GRID */
+  .module-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+    margin: 16px 0;
+  }
+
+  .module-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 14px 16px;
+  }
+
+  .module-name {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    color: var(--accent3);
+    margin-bottom: 4px;
+    font-weight: 700;
+  }
+
+  .module-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+  /* ERROR ANATOMY */
+  .error-anatomy {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 20px;
+    margin: 16px 0;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    line-height: 2;
+  }
+
+  .err-line { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 4px; }
+  .err-tag {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 2px;
+    flex-shrink: 0;
+    letter-spacing: 1px;
+    margin-top: 2px;
+  }
+
+  .err-tag.where { background: rgba(96,165,250,0.15); color: var(--accent2); }
+  .err-tag.what  { background: rgba(248,113,113,0.15); color: #f87171; }
+  .err-tag.why   { background: rgba(245,158,11,0.15);  color: var(--accent); }
+
+  .err-text { color: #f87171; }
+  .err-note { font-size: 11px; color: var(--muted); font-style: italic; }
+
+  /* TRY EXCEPT DIAGRAM */
+  .try-diagram {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 24px;
+    margin: 16px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+  }
+
+  .td-box {
+    padding: 10px 28px;
+    border-radius: 3px;
+    text-align: center;
+    min-width: 200px;
+  }
+
+  .td-try    { background: rgba(245,158,11,0.1);  border: 1px solid rgba(245,158,11,0.3);  color: var(--accent); }
+  .td-error  { background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.3); color: #f87171; }
+  .td-except { background: rgba(96,165,250,0.1);  border: 1px solid rgba(96,165,250,0.3);  color: var(--accent2); }
+  .td-else   { background: rgba(52,211,153,0.1);  border: 1px solid rgba(52,211,153,0.3);  color: var(--accent3); }
+  .td-finally{ background: rgba(100,100,140,0.1); border: 1px solid rgba(100,100,140,0.3); color: #9090c0; }
+
+  .td-arrow { color: var(--muted); font-size: 14px; }
+  .td-row { display: flex; gap: 20px; align-items: flex-start; }
+  .td-branch { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .td-branch-label { font-size: 10px; letter-spacing: 1px; }
+  .td-label-ok  { color: var(--accent3); }
+  .td-label-err { color: #f87171; }
+
+  /* CALLOUT */
+  .callout {
+    background: rgba(245,158,11,0.05);
+    border: 1px solid rgba(245,158,11,0.2);
+    border-radius: 4px;
+    padding: 16px 20px;
+    margin: 16px 0;
+    font-size: 14px;
+    color: #806040;
+    line-height: 1.7;
+  }
+
+  .callout-label { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 2px; color: var(--accent); margin-bottom: 6px; }
+
+  .callout.blue { background: rgba(96,165,250,0.05); border-color: rgba(96,165,250,0.2); color: #506080; }
+  .callout.blue .callout-label { color: var(--accent2); }
+
+  .callout.green { background: rgba(52,211,153,0.05); border-color: rgba(52,211,153,0.2); color: #407060; }
+  .callout.green .callout-label { color: var(--accent3); }
+
+  .callout.red { background: rgba(248,113,113,0.05); border-color: rgba(248,113,113,0.2); color: #806060; }
+  .callout.red .callout-label { color: #f87171; }
+
+  /* TRY IT */
+  .try-it {
+    background: rgba(245,158,11,0.04);
+    border: 1px solid rgba(245,158,11,0.15);
+    border-radius: 4px;
+    padding: 18px 20px;
+    margin-top: 18px;
+  }
+
+  .try-it-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .try-it-label::before { content: '▶'; font-size: 10px; }
+  .try-it-text { font-size: 14px; color: #706040; line-height: 1.7; }
+
+  /* PROJECT */
+  .project-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 32px;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+
+  .project-banner {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+  }
+
+  .project-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    background: rgba(245,158,11,0.08);
+    padding: 4px 10px;
+    border: 1px solid rgba(245,158,11,0.22);
+    border-radius: 2px;
+    display: inline-block;
+    margin-bottom: 16px;
+  }
+
+  .project-title { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 6px; }
+  .project-subtitle { font-size: 14px; color: var(--muted); margin-bottom: 20px; }
+
+  /* CHECKLIST */
+  .checklist { list-style: none; margin-top: 20px; }
+
+  .checklist li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    color: #806040;
+    line-height: 1.5;
+  }
+
+  .checklist li:last-child { border-bottom: none; }
+
+  .check-box {
+    width: 18px; height: 18px;
+    border: 1.5px solid var(--border);
+    border-radius: 2px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  /* HOMEWORK */
+  .homework-card {
+    background: linear-gradient(135deg, rgba(245,158,11,0.05), rgba(96,165,250,0.03));
+    border: 1px solid rgba(245,158,11,0.2);
+    border-radius: 4px;
+    padding: 28px;
+    margin-top: 20px;
+  }
+
+  .homework-title { font-size: 20px; font-weight: 800; color: var(--accent); margin-bottom: 8px; letter-spacing: -0.5px; }
+
+  .tweet-preview {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 20px;
+    margin-top: 16px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text);
+  }
+
+  .tweet-preview .hashtag { color: #4aa0f0; font-weight: 600; }
+
+  code {
+    background: var(--surface2);
+    padding: 2px 8px;
+    border-radius: 2px;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+  }
+
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+    <nav class="top-nav">
+      <a href="Intro.html">Intro</a>
+      <a href="functions.html">Functions</a>
+      <a href="forLoops.html">For Loops</a>
+      <a href="conditionals.html">Conditionals</a>
+      <a href="listCollections.html">List Collections</a>
+      <a href="dictionaries.html">Dictionaries</a>
+      <a href="ModulesAnd_errorhandling.html">Modules & Error Handling</a>
+
+
+    </nav>
+    
+<header>
+  <div class="topic-badge">Session 1 of 2</div>
+  <h1>Modules &<br><span>Error Handling</span></h1>
+  <div class="header-sub">How to use Python's built-in superpowers — and how to write code that doesn't crash when something goes wrong.</div>
+  <div class="header-meta">
+    <div class="meta-pill">2 HOURS</div>
+    <div class="meta-pill">IMPORT · TRY · EXCEPT</div>
+    <div class="meta-pill">#BUILDINPUBLIC</div>
+  </div>
+</header>
+
+<main>
+
+  <!-- NEXT SESSION TEASER -->
+  <div class="next-session" style="margin-top:40px;">
+    <div class="next-session-icon">🚀</div>
+    <div>
+      <div class="next-session-title">Coming up — Session 2</div>
+      <div class="next-session-text">Next session is the one you've been building toward: <strong style="color:var(--accent2);">File Handling + Your First Real AI API Call.</strong> Everything you learn today — modules, imports, and error handling — will be used directly in that session. Think of today as loading the tools before the mission.</div>
+    </div>
+  </div>
+
+  <div class="goal-card">
+    <div class="goal-label">🎯 What You'll Be Able to Do After This</div>
+    <div class="goal-text">
+      You'll know how to <strong>import Python's built-in modules</strong> to add powerful features without writing everything yourself, how to <strong>install and use third-party packages</strong> with pip, and how to write code that <strong>handles errors gracefully</strong> instead of crashing. These two skills are the difference between a script that works once and a program that works reliably every time.
+    </div>
+  </div>
+
+  <!-- PART 1 — MODULES -->
+  <div class="section-label">
+    <div class="section-number">Part 01</div>
+    <div class="section-divider"></div>
+  </div>
+  <div class="section-title">Modules & Importing</div>
+
+  <!-- CONCEPT 1 -->
+  <div class="concept-card" style="margin-top:24px;">
+    <div class="concept-header">
+      <div class="concept-title">What is a Module? Why Not Write Everything Yourself?</div>
+      <div class="time-tag">15 mins</div>
+    </div>
+
+    <div class="analogy-box">
+      <div class="analogy-label">💡 Think of it this way</div>
+      Python comes with a massive toolbox of pre-built tools — but they're not loaded by default, because you don't always need all of them. A <strong>module</strong> is one drawer in that toolbox. When you need it, you open it with <code>import</code>. Why write your own random number generator when Python already has a perfect one? Why write your own date calculator? Someone else already did it. You just import it and use it.
+    </div>
+
+    <div class="student-voice">
+      There are three kinds of modules you'll use: <strong>built-in modules</strong> that come with Python (no installation needed), <strong>third-party packages</strong> that you install with <code>pip</code>, and <strong>your own modules</strong> — Python files you write yourself that you import into other files. Today we focus on the first two. The third one you're already doing every time you write a <code>.py</code> file with functions.
+    </div>
+
+    <div class="module-grid">
+      <div class="module-card">
+        <div class="module-name">random</div>
+        <div class="module-desc">Random numbers, choices, shuffling</div>
+      </div>
+      <div class="module-card">
+        <div class="module-name">math</div>
+        <div class="module-desc">Square roots, powers, pi, floor/ceiling</div>
+      </div>
+      <div class="module-card">
+        <div class="module-name">datetime</div>
+        <div class="module-desc">Current date & time, date maths</div>
+      </div>
+      <div class="module-card">
+        <div class="module-name">os</div>
+        <div class="module-desc">File paths, environment variables, system info</div>
+      </div>
+      <div class="module-card">
+        <div class="module-name">json</div>
+        <div class="module-desc">Read and write JSON data ← used with every API</div>
+      </div>
+      <div class="module-card">
+        <div class="module-name">time</div>
+        <div class="module-desc">Pausing scripts, measuring how long code takes</div>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div>
+        <div class="code-filename">modules_intro.py</div>
+      </div>
+      <div class="code-body">
+<span class="py-comment"># Three ways to import</span><br><br>
+<span class="py-comment"># 1. Import the whole module</span><br>
+<span class="py-keyword">import</span> <span class="py-module">random</span><br>
+<span class="py-func">print</span>(<span class="py-module">random</span>.randint(<span class="py-number">1</span>, <span class="py-number">10</span>))        <span class="py-comment"># random number 1–10</span><br>
+<span class="py-func">print</span>(<span class="py-module">random</span>.choice([<span class="py-string">"Python"</span>, <span class="py-string">"AI"</span>, <span class="py-string">"APIs"</span>])) <span class="py-comment"># random item from list</span><br><br>
+<span class="py-comment"># 2. Import just what you need (cleaner)</span><br>
+<span class="py-keyword">from</span> <span class="py-module">math</span> <span class="py-keyword">import</span> sqrt, pi<br>
+<span class="py-func">print</span>(<span class="py-func">sqrt</span>(<span class="py-number">144</span>))    <span class="py-comment"># → 12.0</span><br>
+<span class="py-func">print</span>(<span class="py-func">round</span>(pi, <span class="py-number">4</span>)) <span class="py-comment"># → 3.1416</span><br><br>
+<span class="py-comment"># 3. Import with a shorter alias (very common with big packages)</span><br>
+<span class="py-keyword">import</span> <span class="py-module">datetime</span> <span class="py-keyword">as</span> dt<br>
+<span class="py-var">today</span> = dt.date.today()<br>
+<span class="py-func">print</span>(<span class="py-fstring">f"Today is: {<span class="py-var">today</span>}"</span>)<br><br>
+<span class="py-comment"># os — useful for environment variables (API keys live here!)</span><br>
+<span class="py-keyword">import</span> <span class="py-module">os</span><br>
+<span class="py-func">print</span>(<span class="py-module">os</span>.getcwd())  <span class="py-comment"># prints your current working directory</span>
+      </div>
+    </div>
+    <div class="output-block">
+      <div class="output-label">Example Output</div>
+      7<br>AI<br>12.0<br>3.1416<br>Today is: 2025-03-30<br>/home/marcus/Python-Learning-Journey
+    </div>
+
+    <div class="callout blue">
+      <div class="callout-label">💡 Why os is important for AI engineering</div>
+      When you call an AI API, you'll need a secret key — called an <strong>API key</strong>. You never hard-code it directly in your script (that's a security risk). Instead, you store it as an <strong>environment variable</strong> and read it with <code>os.environ.get("API_KEY")</code>. The <code>os</code> module is how you do that. You'll use this in the very next session.
+    </div>
+
+    <div class="try-it">
+      <div class="try-it-label">Try It</div>
+      <div class="try-it-text">
+        Import <code>random</code> and <code>datetime</code>. Build a function called <code>daily_challenge()</code> that: picks a random topic from a list of things you're learning (<em>"Functions", "Lists", "Dicts"</em> etc.), prints today's date using <code>datetime</code>, and prints a challenge like <em>"Today is Monday 30 March. Your challenge: build something using Dictionaries!"</em>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONCEPT 2: pip -->
+  <div class="concept-card blue">
+    <div class="concept-header">
+      <div class="concept-title">Installing Third-Party Packages with pip</div>
+      <div class="time-tag">15 mins</div>
+    </div>
+
+    <div class="student-voice">
+      Built-in modules are great — but the real power of Python is the thousands of packages other developers have built and shared. You install them using <em>pip</em> — Python's package manager — from your terminal. Once installed, you import them just like any other module. This is how you'll install the <strong>Anthropic package</strong> next session to make your first AI API call.
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div>
+        <div class="code-filename">terminal (not a .py file)</div>
+      </div>
+      <div class="code-body">
+<span class="py-comment"># Install a package from the terminal</span><br>
+pip install requests<br><br>
+<span class="py-comment"># Install multiple packages at once</span><br>
+pip install requests anthropic python-dotenv<br><br>
+<span class="py-comment"># See everything you've installed</span><br>
+pip list<br><br>
+<span class="py-comment"># Save your project's requirements to a file</span><br>
+pip freeze > requirements.txt
+      </div>
+    </div>
+
+    <div class="code-block" style="margin-top:12px;">
+      <div class="code-header">
+        <div class="code-dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div>
+        <div class="code-filename">using_requests.py</div>
+      </div>
+      <div class="code-body">
+<span class="py-comment"># After running: pip install requests</span><br>
+<span class="py-keyword">import</span> <span class="py-module">requests</span><br><br>
+<span class="py-comment"># Fetch data from a public API — no key needed</span><br>
+<span class="py-var">response</span> = <span class="py-module">requests</span>.get(<span class="py-string">"https://api.github.com"</span>)<br>
+<span class="py-func">print</span>(<span class="py-fstring">f"Status: {<span class="py-var">response</span>.status_code}"</span>)  <span class="py-comment"># 200 = success</span><br>
+<span class="py-func">print</span>(<span class="py-fstring">f"Type: {<span class="py-var">response</span>.headers[<span class="py-string">'Content-Type'</span>]}"</span>)
+      </div>
+    </div>
+
+    <div class="callout green">
+      <div class="callout-label">📦 Packages you'll install in the next two sessions</div>
+      Run these now in your terminal so you're ready: <br><br>
+      <code>pip install anthropic python-dotenv requests</code><br><br>
+      <strong>anthropic</strong> — the official Python package for the Claude AI API<br>
+      <strong>python-dotenv</strong> — loads API keys from a <code>.env</code> file safely<br>
+      <strong>requests</strong> — makes HTTP requests to any API on the internet
+    </div>
+
+    <div class="try-it">
+      <div class="try-it-label">Try It</div>
+      <div class="try-it-text">Open your terminal and run <code>pip install anthropic python-dotenv requests</code>. Once installed, run <code>pip list</code> and find the three packages in the output. Screenshot the terminal — this is prep for the next session and worth saving.</div>
+    </div>
+  </div>
+
+  <!-- PART 2 — ERROR HANDLING -->
+  <div class="section-label">
+    <div class="section-number">Part 02</div>
+    <div class="section-divider"></div>
+  </div>
+  <div class="section-title">Error Handling — Writing Code That Doesn't Crash</div>
+
+  <!-- CONCEPT 3 -->
+  <div class="concept-card red">
+    <div class="concept-header">
+      <div class="concept-title">Reading Errors — They're Helping You, Not Attacking You</div>
+      <div class="time-tag">15 mins</div>
+    </div>
+
+    <div class="analogy-box" style="background:rgba(248,113,113,0.04);border-color:rgba(248,113,113,0.14);border-left-color:#f87171;">
+      <div class="analogy-label" style="color:#f87171;">💡 Think of it this way</div>
+      An error message is Python's way of pointing at exactly where things went wrong and why. Most beginners panic when they see a red wall of text. But once you learn to read it, an error message is the most useful thing Python can tell you. It's not a failure — it's a very specific hint about what to fix.
+    </div>
+
+    <div class="student-voice">
+      Every Python error has three parts. Learn to find these three things and you can debug almost anything.
+    </div>
+
+    <div class="error-anatomy">
+      <div class="err-line">
+        <div class="err-tag where">WHERE</div>
+        <div>
+          <div class="err-text">File "calculator.py", line 12, in divide</div>
+          <div class="err-note">← the file name and line number where it crashed</div>
+        </div>
+      </div>
+      <div class="err-line">
+        <div class="err-tag what">WHAT</div>
+        <div>
+          <div class="err-text">ZeroDivisionError</div>
+          <div class="err-note">← the type of error — search this on Google if unsure</div>
+        </div>
+      </div>
+      <div class="err-line">
+        <div class="err-tag why">WHY</div>
+        <div>
+          <div class="err-text">division by zero</div>
+          <div class="err-note">← the human-readable explanation of what went wrong</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="module-grid" style="margin-top:16px;">
+      <div class="module-card">
+        <div class="module-name" style="color:#f87171;">ValueError</div>
+        <div class="module-desc">Wrong type of value — e.g. int("hello")</div>
+      </div>
+      <div class="module-card">
+        <div class="module-name" style="color:#f87171;">TypeError</div>
+        <div class="module-desc">Wrong type used — e.g. "5" + 5</div>
+      </div>
+      <div class="module-card">
+        <div class="module-name" style="color:#f87171;">KeyError</div>
+        <div class="module-desc">Dict key doesn't exist</div>
+      </div>
+      <div class="module-card">
+        <div class="module-name" style="color:#f87171;">IndexError</div>
+        <div class="module-desc">List index out of range</div>
+      </div>
+      <div class="module-card">
+        <div class="module-name" style="color:#f87171;">FileNotFoundError</div>
+        <div class="module-desc">File path doesn't exist</div>
+      </div>
+      <div class="module-card">
+        <div class="module-name" style="color:#f87171;">ZeroDivisionError</div>
+        <div class="module-desc">Dividing by zero</div>
+      </div>
+    </div>
+
+    <div class="try-it">
+      <div class="try-it-label">Try It — Deliberately Cause Errors</div>
+      <div class="try-it-text">
+        In a new file, write code that causes each of these errors one at a time: try <code>int("hello")</code>, try adding a string and a number, try accessing <code>my_list[100]</code> on a short list. Read the full error message each time. Identify the WHERE, WHAT, and WHY. Getting comfortable with errors is one of the most important skills you can build.
+      </div>
+    </div>
+  </div>
+
+  <!-- CONCEPT 4: try/except -->
+  <div class="concept-card green">
+    <div class="concept-header">
+      <div class="concept-title">try / except / else / finally — Catching Errors Before They Crash</div>
+      <div class="time-tag">25 mins</div>
+    </div>
+
+    <div class="student-voice">
+      Now that you can read errors, here's how you <strong>handle them</strong> without crashing. The <code>try/except</code> block says: <em>"try this code — if something goes wrong, don't crash, run this instead."</em> This is essential for any real program that takes user input, reads files, or calls APIs — because all of those can fail in ways you can't predict.
+    </div>
+
+    <div class="try-diagram">
+      <div class="td-box td-try">try: run this code</div>
+      <div class="td-arrow">↓</div>
+      <div class="td-row">
+        <div class="td-branch">
+          <div class="td-branch-label td-label-err">ERROR occurred</div>
+          <div class="td-arrow">↓</div>
+          <div class="td-box td-except">except: handle the error</div>
+        </div>
+        <div class="td-branch">
+          <div class="td-branch-label td-label-ok">NO error</div>
+          <div class="td-arrow">↓</div>
+          <div class="td-box td-else">else: runs only if no error</div>
+        </div>
+      </div>
+      <div class="td-arrow">↓</div>
+      <div class="td-box td-finally">finally: always runs, no matter what</div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div>
+        <div class="code-filename">try_except.py</div>
+      </div>
+      <div class="code-body">
+<span class="py-comment"># Basic try/except — stop a crash from a bad input</span><br>
+<span class="py-keyword">def</span> <span class="py-def">safe_divide</span>(<span class="py-param">a</span>, <span class="py-param">b</span>):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">try</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">result</span> = <span class="py-param">a</span> / <span class="py-param">b</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">except</span> <span class="py-error">ZeroDivisionError</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-string">"❌ Can't divide by zero!"</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">return</span> <span class="py-keyword">None</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">else</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-fstring">f"✅ Result: {<span class="py-var">result</span>}"</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">return</span> <span class="py-var">result</span><br><br>
+<span class="py-def">safe_divide</span>(<span class="py-number">10</span>, <span class="py-number">2</span>)   <span class="py-comment"># → ✅ Result: 5.0</span><br>
+<span class="py-def">safe_divide</span>(<span class="py-number">10</span>, <span class="py-number">0</span>)   <span class="py-comment"># → ❌ Can't divide by zero!</span><br><br>
+<span class="py-comment"># Catching multiple error types</span><br>
+<span class="py-keyword">def</span> <span class="py-def">safe_input_number</span>():<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">try</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">num</span> = <span class="py-func">int</span>(<span class="py-func">input</span>(<span class="py-string">"Enter a number: "</span>))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">return</span> <span class="py-var">num</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">except</span> <span class="py-error">ValueError</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-string">"❌ That's not a valid number. Try again."</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">return</span> <span class="py-keyword">None</span><br><br>
+<span class="py-comment"># Catching ANY error — use sparingly</span><br>
+<span class="py-keyword">def</span> <span class="py-def">safe_api_call</span>():<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">try</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-comment"># imagine an API call here</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">pass</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">except</span> <span class="py-error">Exception</span> <span class="py-keyword">as</span> <span class="py-var">e</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-fstring">f"Something went wrong: {<span class="py-var">e</span>}"</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">finally</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-string">"API call attempted."</span>)  <span class="py-comment"># always runs</span>
+      </div>
+    </div>
+
+    <div class="callout red">
+      <div class="callout-label">⚠️ Don't Catch Errors You Don't Understand</div>
+      It's tempting to write <code>except Exception</code> everywhere to silence all errors — but this hides real bugs. Always catch the <strong>specific error type</strong> you expect. Only use <code>except Exception as e</code> as a last resort, and always print <code>e</code> so you can see what went wrong.
+    </div>
+
+    <div class="try-it">
+      <div class="try-it-label">Try It</div>
+      <div class="try-it-text">Go back to your calculator project from a previous session. Wrap the division function in a <code>try/except</code> for <code>ZeroDivisionError</code>. Then wrap the number input in a <code>try/except</code> for <code>ValueError</code> so that typing a word instead of a number doesn't crash the program — just prints a friendly message.</div>
+    </div>
+  </div>
+
+  <!-- PART 3 — PROJECT -->
+  <div class="section-label">
+    <div class="section-number">Part 03</div>
+    <div class="section-divider"></div>
+  </div>
+  <div class="section-title">Today's Project</div>
+
+  <div class="project-card" style="margin-top:24px;">
+    <div class="project-banner"></div>
+    <div class="project-label">BUILD</div>
+    <div class="project-title">The Unbreakable Quiz</div>
+    <div class="project-subtitle">Modules + Error Handling + Everything Before — 40 mins</div>
+
+    <div class="student-voice" style="margin-bottom: 0;">
+      Remember the quiz game you built earlier? You're going to rebuild it — better. This version uses <code>random</code> to shuffle the questions, <code>datetime</code> to timestamp the result, and <code>try/except</code> to make sure no bad input can ever crash it. A quiz that cannot be broken no matter what the user types.
+    </div>
+
+    <div class="code-block" style="margin-top:20px;">
+      <div class="code-header">
+        <div class="code-dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div>
+        <div class="code-filename">unbreakable_quiz.py</div>
+      </div>
+      <div class="code-body">
+<span class="py-keyword">import</span> <span class="py-module">random</span><br>
+<span class="py-keyword">from</span> <span class="py-module">datetime</span> <span class="py-keyword">import</span> datetime<br><br>
+<span class="py-var">questions</span> = [<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{<span class="py-key">"q"</span>: <span class="py-string">"What keyword defines a function in Python?"</span>, <span class="py-key">"a"</span>: <span class="py-string">"def"</span>},<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{<span class="py-key">"q"</span>: <span class="py-string">"What data structure uses key-value pairs?"</span>, <span class="py-key">"a"</span>: <span class="py-string">"dictionary"</span>},<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{<span class="py-key">"q"</span>: <span class="py-string">"What loop runs while a condition is True?"</span>, <span class="py-key">"a"</span>: <span class="py-string">"while"</span>},<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{<span class="py-key">"q"</span>: <span class="py-string">"Which company makes Claude AI?"</span>, <span class="py-key">"a"</span>: <span class="py-string">"anthropic"</span>},<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{<span class="py-key">"q"</span>: <span class="py-string">"What command installs Python packages?"</span>, <span class="py-key">"a"</span>: <span class="py-string">"pip"</span>}<br>
+]<br><br>
+<span class="py-keyword">def</span> <span class="py-def">run_quiz</span>(<span class="py-param">name</span>):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">score</span> = <span class="py-number">0</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">shuffled</span> = <span class="py-module">random</span>.sample(<span class="py-param">questions</span>, <span class="py-func">len</span>(<span class="py-param">questions</span>))<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-fstring">f"\nHey {<span class="py-param">name</span>}! {<span class="py-func">len</span>(<span class="py-var">shuffled</span>)} questions. Let's go.\n"</span>)<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">for</span> <span class="py-var">i</span>, <span class="py-var">item</span> <span class="py-keyword">in</span> <span class="py-func">enumerate</span>(<span class="py-var">shuffled</span>):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">try</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">answer</span> = <span class="py-func">input</span>(<span class="py-fstring">f"Q{<span class="py-var">i</span>+<span class="py-number">1</span>}: {<span class="py-var">item</span>[<span class="py-key">'q'</span>]} "</span>).strip().lower()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">except</span> <span class="py-error">Exception</span> <span class="py-keyword">as</span> <span class="py-var">e</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-fstring">f"Input error: {<span class="py-var">e</span>}. Skipping."</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">continue</span><br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">if</span> <span class="py-var">answer</span> == <span class="py-var">item</span>[<span class="py-key">"a"</span>]:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-string">"✅ Correct!\n"</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">score</span> += <span class="py-number">1</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">else</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-fstring">f"✗ The answer was: {<span class="py-var">item</span>[<span class="py-key">'a'</span>]}\n"</span>)<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">return</span> <span class="py-var">score</span><br><br>
+<span class="py-keyword">def</span> <span class="py-def">main</span>():<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">try</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">name</span> = <span class="py-func">input</span>(<span class="py-string">"Enter your name: "</span>).strip()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">if</span> <span class="py-keyword">not</span> <span class="py-var">name</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">name</span> = <span class="py-string">"Coder"</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-keyword">except</span> <span class="py-error">Exception</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">name</span> = <span class="py-string">"Coder"</span><br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">score</span> = <span class="py-def">run_quiz</span>(<span class="py-var">name</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">total</span> = <span class="py-func">len</span>(<span class="py-var">questions</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">timestamp</span> = datetime.now().strftime(<span class="py-string">"%d %b %Y, %H:%M"</span>)<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-fstring">f"--- Result for {<span class="py-var">name</span>} | {<span class="py-var">timestamp</span>} ---"</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="py-func">print</span>(<span class="py-fstring">f"Score: {<span class="py-var">score</span>}/{<span class="py-var">total</span>} ({<span class="py-func">round</span>(<span class="py-var">score</span>/<span class="py-var">total</span>*<span class="py-number">100</span>)}%)"</span>)<br><br>
+<span class="py-def">main</span>()
+      </div>
+    </div>
+
+    <div class="output-block">
+      <div class="output-label">Example Session</div>
+      Enter your name: Marcus<br><br>
+      Hey Marcus! 5 questions. Let's go.<br><br>
+      Q1: Which company makes Claude AI? <span style="color:var(--accent2)">anthropic</span><br>
+      ✅ Correct!<br><br>
+      Q2: What command installs Python packages? <span style="color:var(--accent2)">pip</span><br>
+      ✅ Correct!<br><br>
+      --- Result for Marcus | 30 Mar 2025, 14:22 ---<br>
+      Score: 4/5 (80%)
+    </div>
+
+    <div class="callout" style="background:rgba(245,158,11,0.04);border-color:rgba(245,158,11,0.18);margin-top:20px;">
+      <div class="callout-label">🔥 STRETCH CHALLENGE</div>
+      Add your own questions to the list — at least 3 that are about AI, automation, or things you've learned. Then add a <code>while</code> loop around the name input that keeps asking until the user types something — so the quiz can never start with an empty name.
+    </div>
+
+    <ul class="checklist">
+      <li><div class="check-box"></div><code>random</code> and <code>datetime</code> imported and used correctly</li>
+      <li><div class="check-box"></div>Questions stored as a list of dictionaries</li>
+      <li><div class="check-box"></div><code>random.sample()</code> shuffles questions on every run</li>
+      <li><div class="check-box"></div><code>try/except</code> wraps user input so nothing can crash the loop</li>
+      <li><div class="check-box"></div>Timestamp printed with the final score using <code>datetime</code></li>
+      <li><div class="check-box"></div>Score shown as both a fraction and a percentage</li>
+      <li><div class="check-box"></div>Stretch: 3+ new AI/tech questions added to the list</li>
+    </ul>
+  </div>
+
+  <!-- HOMEWORK -->
+  <div class="homework-card">
+    <div class="homework-title">🚀 Build in Public</div>
+    <div style="font-size:14px;color:#605030;margin-bottom:20px;line-height:1.7;">
+      Also — run <code>pip install anthropic python-dotenv requests</code> in your terminal if you haven't already. You'll need those ready for next session.
+    </div>
+
+    <ul class="checklist">
+      <li><div class="check-box"></div><div><strong style="color:var(--text);">GitHub:</strong> Push <code>unbreakable_quiz.py</code> to your repo. Commit message: <em>"Modules & error handling: unbreakable quiz with random shuffle and timestamp"</em></div></li>
+      <li><div class="check-box"></div><div><strong style="color:var(--text);">Screenshot:</strong> Run the quiz twice — show that the questions come in a different order each time. That's the <code>random</code> module doing its job.</div></li>
+      <li><div class="check-box"></div><div><strong style="color:var(--text);">Post on X:</strong> Use the caption below.</div></li>
+    </ul>
+
+    <div class="tweet-preview">
+      Learned two things today that change everything: modules (using Python's built-in superpowers without writing from scratch) and error handling (code that doesn't crash when something goes wrong). Rebuilt my quiz app — it now shuffles questions randomly and timestamps every result. Next session: my first real AI API call. 👀 <span class="hashtag">#100DaysOfCode</span> <span class="hashtag">#Python</span> <span class="hashtag">#BuildInPublic</span> <span class="hashtag">#AIEngineering</span>
+    </div>
+  </div>
+
+</main>
+</body>
+</html>
